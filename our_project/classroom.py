@@ -247,7 +247,7 @@ class AdditionTask(AbstractTask):
     def categorical_crossentropy(self, y_pred, y_true):
         # dimensions as in https://stackoverflow.com/questions/60121107/pytorch-nllloss-function-target-shape-mismatch
         y_true_argmax = torch.argmax(y_true, dim=-1).view(-1)  # flatten
-        return torch.nn.NLLLoss()(torch.log(y_pred).view(-1, y_pred.shape[2]), y_true_argmax)
+        return torch.nn.NLLLoss()(torch.log(y_pred).reshape(-1, y_pred.shape[2]), y_true_argmax)
 
 
     def loss_fn(self, pred, y, lengths):
