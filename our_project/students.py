@@ -140,7 +140,7 @@ class AdditionLSTM(torch.nn.Module):
         self.linear = torch.nn.Linear(
             in_features=128, out_features=onehot_features
         )
-        self.softmax = nn.Softmax(dim=1)
+        self.softmax = torch.nn.Softmax(dim=1)
 
     def forward(self, encoded_input):
         '''Forward pass: pass the input through a LSTM, uses that repeated
