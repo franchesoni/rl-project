@@ -21,8 +21,11 @@ EPOCHS = config["EPOCHS"]
 NUM_CHARS = config["NUM_CHARS"]
 LR = config["LR"]
 SUMMARY_WRITER_PATH = config["SUMMARY_WRITER_PATH"]
-WRITER = SummaryWriter(SUMMARY_WRITER_PATH)
 SEED = config["SEED"]
+WRITER = SummaryWriter(SUMMARY_WRITER_PATH)
+
+with open(os.path.join(SUMMARY_WRITER_PATH, "config.json"), "w") as f:
+    json.dump(config, f)
 
 #####################
 
