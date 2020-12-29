@@ -185,9 +185,9 @@ from raw_ucb import EFF_RAWUCB
 
 
 class RAWUCBTeacher(AbstractTeacher):
-    def __init__(self, n_actions=1, sigma=1):
+    def __init__(self, n_actions=1, sigma=1, alpha=1.4):
         super().__init__(n_actions)
-        self.policy = EFF_RAWUCB(n_actions, subgaussian=sigma, alpha=1.4)
+        self.policy = EFF_RAWUCB(n_actions, subgaussian=sigma, alpha=alpha)
 
     def give_task(self, last_rewards):
         """Returns probabilities over list of actions"""

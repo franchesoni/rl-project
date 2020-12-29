@@ -8,4 +8,5 @@
 "NUM_CHARS": 12,
 "LR": 0.001,
 "SUMMARY_WRITER_PATH": "./runs/directly_two_lala",
+"TEACHER_NAME": "curriculum", 
 "SEED": 42}

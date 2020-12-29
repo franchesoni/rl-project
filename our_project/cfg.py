@@ -22,6 +22,7 @@ NUM_CHARS = config["NUM_CHARS"]
 LR = config["LR"]
 SUMMARY_WRITER_PATH = config["SUMMARY_WRITER_PATH"]
 SEED = config["SEED"]
+TEACHER_NAME = config["TEACHER_NAME"]
 WRITER = SummaryWriter(SUMMARY_WRITER_PATH)
 
 with open(os.path.join(SUMMARY_WRITER_PATH, "config.json"), "w") as f:
@@ -29,12 +30,15 @@ with open(os.path.join(SUMMARY_WRITER_PATH, "config.json"), "w") as f:
 
 #####################
 
+
 def seed_everything(seed):
     random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+
+
 seed_everything(SEED)

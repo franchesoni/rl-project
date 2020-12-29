@@ -20,13 +20,13 @@ class AbstractClassroom:
 
     def generate_task(self, task_index):
         """Generates a new task according to index"""
-        NotImplementedError(
+        raise NotImplementedError(
             "This is an abstract class, you should implement this method"
         )
 
     def compute_reward(self, obs):
         """Computes the reward from obs"""
-        NotImplementedError(
+        raise NotImplementedError(
             "This is an abstract class, you should implement this method"
         )
 
