@@ -7,5 +7,5 @@
 "EPOCHS": 100,
 "NUM_CHARS": 12,
 "LR": 0.001,
-"SUMMARY_WRITER_PATH": "./runs/directly_two",
+"SUMMARY_WRITER_PATH": "./runs/directly_two_again",
 "SEED": 42}
