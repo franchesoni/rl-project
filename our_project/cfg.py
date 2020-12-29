@@ -1,3 +1,12 @@
+import random
+import os
+
+import numpy as np
+import torch
+from torch.utils.tensorboard import SummaryWriter
+
+#####################
+
 N_INTERACTIONS = 1
 # Addition config
 CURRICULUM = [[0, 1]]
@@ -8,12 +17,9 @@ BATCH_SIZE=320
 EPOCHS=100
 NUM_CHARS = 12
 LR=0.001
+
 #####################
-import random
-import os
-import numpy as np
-import torch
-#####################
+
 SEED = 42
 def seed_everything(seed):
     random.seed(seed)
@@ -24,8 +30,9 @@ def seed_everything(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 seed_everything(SEED)
+
 ##################
-# os.system('rm -rf /home/franchesoni/Documents/mva/mva/rl/project/runs')
-from torch.utils.tensorboard import SummaryWriter
+
 WRITER = SummaryWriter('./runs/directly_two')
+
 ###############
