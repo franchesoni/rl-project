@@ -96,13 +96,13 @@ class CurriculumTeacher(AbstractTeacher):
         """
         super().__init__(n_actions)
         self.curriculum = curriculum
+        self.curriculum_step = 0
 
     def give_task(self, last_reward):
-        curriculum_step = 0
-        p = self.curriculum[curriculum_step]
+        p = self.curriculum[self.curriculum_step]
         if last_reward == 'A':  # advance when reward is 'A'
-            curriculum_step += 1
-        return p
+            self.curriculum_step += 1
+        return np.random.choice(range(len(p)), size=1, p=p)
 
 
 
