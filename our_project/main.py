@@ -1,6 +1,6 @@
 
 from cfg import CURRICULUM, N_INTERACTIONS, WRITER
-from classroom import TestAdditionClassroom
+from classroom import AdditionClassroom
 from students import AdditionStudent
 from teachers import CurriculumTeacher
 
@@ -16,10 +16,11 @@ if __name__=='__main__':
 
     teacher = CurriculumTeacher(curriculum=CURRICULUM, n_actions=len(CURRICULUM[0]))
     student = AdditionStudent()
-    classroom = TestAdditionClassroom(teacher=teacher, student=student)
+    classroom = AdditionClassroom(teacher=teacher, student=student)
 
     for _ in range(N_INTERACTIONS):
         classroom.step()
 
+    # # the following now works
     # from teachers import test_RAWUCB
     # test_RAWUCB()

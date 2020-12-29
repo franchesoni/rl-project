@@ -6,10 +6,10 @@ import torch
 from cfg import BATCH_SIZE, EPOCHS, MAX_DIGITS, NUM_CHARS, TRAIN_SIZE, VAL_SIZE, WRITER
 
 
-'''This is the longest and ugliest code. Have a look at <AbstractClassroom>
+"""This is the longest and ugliest code. Have a look at <AbstractClassroom>
 to get an idea of the utility of having a classroom: it basically generates the
 tasks signaled by the teacher and passes them to the student, then observes the
-student and comes back to the teacher with a reward signal.'''
+student and comes back to the teacher with a reward signal."""
 
 
 class AbstractClassroom:
@@ -24,8 +24,8 @@ class AbstractClassroom:
             "This is an abstract class, you should implement this method"
         )
 
-    def compute_reward(self, task_index):
-        """Generates a new task according to index"""
+    def compute_reward(self, obs):
+        """Computes the reward from obs"""
         NotImplementedError(
             "This is an abstract class, you should implement this method"
         )
@@ -36,24 +36,20 @@ class AbstractClassroom:
         obs = self.student.learn_from_task(task)
         self.reward = self.compute_reward(obs)
 
-        WRITER.add_scalar('Classroom reward', self.reward)
+        WRITER.add_scalar("Classroom reward", self.reward)
 
-'''The abstract task has the training parameters for the student learning. It
+
+"""The abstract task has the training parameters for the student learning. It
 uses probability distributions over the tasks. This allows the teacher to give
 only one task (by setting that task as with probability 1) or mix tasks. The
 mixing is inside the generating data. We should see how much efficiency is lost
 by reducing batch size, as it's needed for the bandit framework. Another option
-is to set tasks as being a set of handcrafted curricula.'''
+is to set tasks as being a set of handcrafted curricula."""
+
 
 class AbstractTask:
     def __init__(
-        self,
-        train_dist,
-        train_size,
-        val_dist,
-        val_size,
-        batch_size=4096,
-        epochs=1,
+        self, train_dist, train_size, val_dist, val_size, batch_size=4096, epochs=1,
     ):
         self.train_dist = train_dist
         self.train_size = train_size
@@ -93,6 +89,8 @@ class AbstractTask:
         raise NotImplementedError(
             "This is an abstract class, you should implement this method"
         )
+
+
 ########################################################################################
 ########################################################################################
 ########################################################################################
@@ -100,12 +98,14 @@ class AbstractTask:
 # TOY ROTTING BANDIT
 
 ###############################################
-'''This does not inherit from abstract classroom because it's not a teacher-stu
+"""This does not inherit from abstract classroom because it's not a teacher-stu
 dent framework. This toy problem comes from the original rotting bandit paper:
 "use Normal distributions with σ 2 = 0.2, and T = 30, 000.
 Non-Parametric: K = 2. As for the expected rewards: μ 1 (n) = 0.5, ∀n, and μ 2 (n) = 1 for its first
 7, 500 pulls and 0.4 afterwards:
-'''
+"""
+
+
 class ToyRottingProblem:
     def __init__(self):
         self.K = 2
@@ -121,18 +121,16 @@ class ToyRottingProblem:
         zero_centered_reward = np.random.randn(1) * self.sigma
         if chosen_arm == 0:
             reward = zero_centered_reward + 0.5
-        elif chosen_arm == 1 and self.t<7500:
+        elif chosen_arm == 1 and self.t < 7500:
             reward = zero_centered_reward + 1
         else:
             reward = zero_centered_reward + 0.4
         self.t += 1
-        if not self.t < 1+self.T:
-            print('Problem has ended, resetting')
+        if not self.t < 1 + self.T:
+            print("Problem has ended, resetting")
             self.reset()
             return None
-        return reward
-
-
+        return np.ones(2) * reward
 
 
 ########################################################################################
@@ -142,7 +140,7 @@ class ToyRottingProblem:
 # ADDITION
 
 ###############################################
-class TestAdditionClassroom(AbstractClassroom):
+class AdditionClassroom(AbstractClassroom):
     def __init__(self, teacher, student):
         super().__init__(teacher, student)
         self.past_obs = [0]  # initialize with something so we can take diff
@@ -163,12 +161,17 @@ class TestAdditionClassroom(AbstractClassroom):
         )
         return task
 
-    def compute_reward(self, obs):
+    def compute_reward_diff(self, obs):
         self.past_obs.append(obs)
+        warnings.warn(RuntimeWarning('This is growing memory'))
         return self.past_obs[-1] - self.past_obs[-2]
 
+    def compute_reward(self, obs):
+        return self.compute_reward_diff(obs)
 
-
+'''This is the task that has _everything_ (except for the NN model, in student,
+and the decision policy, in the teacher, and the reward computation, in the
+classroom)'''
 
 class AdditionTask(AbstractTask):
     def __init__(
@@ -183,20 +186,16 @@ class AdditionTask(AbstractTask):
         invert=True,
     ):
         super().__init__(
-            train_dist,
-            train_size,
-            val_dist,
-            val_size,
-            batch_size,
-            epochs,
+            train_dist, train_size, val_dist, val_size, batch_size, epochs,
         )
         self.val_dist = val_dist
+        self.uniform_dist = np.ones_like(val_dist) / len(val_dist)
         self.max_digits = max_digits
         self.invert = invert
         self.maxlen = max_digits + 1 + max_digits
         self.chars = "0123456789+ "
         self.num_chars = len(sorted(set(self.chars)))
-        assert self.num_chars == NUM_CHARS
+        assert self.num_chars == NUM_CHARS  # check consistency between scripts
         self.ctable = CharacterTable(self.chars, self.maxlen)
 
     def generate_data(self, dist, size):
@@ -212,9 +211,8 @@ class AdditionTask(AbstractTask):
                 len(dist), p=dist
             )  # get a random length in digits according to pdf "dist"
             f = lambda: "".join(  # this was originally wrapped inside int() but that created sums with different n of digits when randomly chosing '09' and '58' for example.
-                    np.random.choice(list("0123456789"))
-                    for i in range(gen_digits)
-                ) # random number generator function
+                np.random.choice(list("0123456789")) for i in range(gen_digits)
+            )  # random number generator function
             a, b = f(), f()
 
             # Pad the data with spaces such that it is always MAXLEN
@@ -228,23 +226,14 @@ class AdditionTask(AbstractTask):
             expected.append(ans)
             lengths.append(gen_digits)
 
-        X = np.zeros(
-            (len(questions), self.maxlen, self.num_chars),
-            dtype=np.bool,
-        )
+        X = np.zeros((len(questions), self.maxlen, self.num_chars), dtype=np.bool,)
         y = np.zeros(
-            (len(questions), self.max_digits + 1, self.num_chars),
-            dtype=np.bool,
+            (len(questions), self.max_digits + 1, self.num_chars), dtype=np.bool,
         )
         for i, sentence in enumerate(questions):
             X[i] = self.ctable.encode(sentence, maxlen=self.maxlen)
         for i, sentence in enumerate(expected):
-            y[i] = self.ctable.encode(
-                sentence, maxlen=self.max_digits + 1
-            )
-
-        WRITER.add_text('Progress', 'Generated data')
-
+            y[i] = self.ctable.encode(sentence, maxlen=self.max_digits + 1)
         return X, y, np.array(lengths)
 
     def accuracy_per_length(self, y_pred, y, lengths):
@@ -259,20 +248,9 @@ class AdditionTask(AbstractTask):
             accs.append(np.mean(tf))
         warnings.warn(
             "accuracy per length computed without pytorch (using numpy only)",
-            RuntimeWarning)
+            RuntimeWarning,
+        )
         return np.array(accs)
-
-    def accuracy_per_length_torch(self, y_pred, y, lengths):
-        """Computes accuracy using model output """
-        y = torch.argmax(y, dim=-1)  # target indices  (batch, max_digits+1)
-        p = torch.argmax(y_pred, dim=-1)  # inferred indices  (batch, max_digits+1)
-        accs = torch.Tensor(self.max_digits)
-        for i in range(self.max_digits):
-            yl = y[lengths == i + 1]  # select those labels with length
-            pl = p[lengths == i + 1]
-            tf = (torch.all(yl == pl, dim=1))  # set to true those that coincide
-            accs[i] = torch.mean((tf*1).float())
-        return accs
 
     def full_number_accuracy(self, y_pred, y_true):
         """Accuracy in the sense of y_true and y_pred being identical"""
@@ -281,27 +259,25 @@ class AdditionTask(AbstractTask):
         tfd = torch.eq(y_true_argmax, y_pred_argmax)
         tfn = torch.all(tfd, dim=1)
         tfc = tfn.float()
-        tfm = torch.mean(tfc)
-        return tfm
+        return torch.mean(tfc)
 
-    def categorical_crossentropy(self, y_pred, y_true):
+    def loss_fn(self, y_pred, y_true, lengths):
+        '''Categorical crossentropy loss'''
         # dimensions as in https://stackoverflow.com/questions/60121107/pytorch-nllloss-function-target-shape-mismatch
         y_true_argmax = torch.argmax(y_true, dim=-1).view(-1)  # flatten
-        return torch.nn.NLLLoss()(torch.log(y_pred).reshape(-1, y_pred.shape[2]), y_true_argmax)
-
-
-    def loss_fn(self, pred, y, lengths):
-        return self.categorical_crossentropy(pred, y)
+        return torch.nn.NLLLoss()(
+            torch.log(y_pred).reshape(-1, y_pred.shape[2]), y_true_argmax
+        )
 
     def get_observation(self, model):
         """Computes the observation given model. This should be reimplemented
         inside Student if it's too inefficient to make a whole new computation."""
-        val_data = self.generate_data(self.val_dist, 100)
+        val_data = self.generate_data(self.uniform_dist, 1000)
         val_X, val_y, val_lens = val_data
         val_X = torch.from_numpy(val_X).float()
         val_y = torch.from_numpy(val_y).float()
         pred = model(val_X).transpose(0, 1)
-        return self.val_score_fn(pred, val_y, val_lens)
+        return self.accuracy_per_length(pred, val_y, val_lens)
 
     def val_score_fn(self, val_pred, val_y, val_lens):
         return self.full_number_accuracy(val_pred, val_y)
@@ -310,10 +286,8 @@ class AdditionTask(AbstractTask):
         """Returns bool telling if val score is enough to finish. It assumes
         the finishing criterium is based on val score. It also finishes when
         n_epochs is completed"""
-        return False
+        return val_score > 0.99
 
-
-    # use categorical crossentropy as loss
 
 
 class CharacterTable(object):
@@ -331,9 +305,9 @@ class CharacterTable(object):
         # sorted list of chars without duplicates
         self.chars = sorted(set(chars))
         # access dict with char to find index as x_ind = self.char_indices['x']
-        self.char_to_indices = dict((c, i) for i, c in enumerate(self.chars))
+        self.char_to_indices = {c: i for i, c in enumerate(self.chars)}
         # access dict with index to find char. It should be the same than self.chars[ind]
-        self.indices_to_char = dict((i, c) for i, c in enumerate(self.chars))
+        self.indices_to_char = {i: c for i, c in enumerate(self.chars)}
 
     def encode(self, C, maxlen=None):
         """encode string C as one-hot encoding
@@ -341,7 +315,9 @@ class CharacterTable(object):
         assert type(C) == str  # check type
         maxlen = maxlen or self.maxlen  # overwrite maxlen if passed
         assert len(C) <= maxlen, "can not encode a sequence larger than maxlen"
-        X = np.zeros((maxlen, len(self.chars)))  # one hot encoding dim: (maxlen, #chars)
+        X = np.zeros(
+            (maxlen, len(self.chars))
+        )  # one hot encoding dim: (maxlen, #chars)
         for i, c in enumerate(C):
             # set a 1 in ith row and corresponding column
             X[i, self.char_to_indices[c]] = 1
