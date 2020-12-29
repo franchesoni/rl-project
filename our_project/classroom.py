@@ -93,6 +93,46 @@ class AbstractTask:
         raise NotImplementedError(
             "This is an abstract class, you should implement this method"
         )
+########################################################################################
+########################################################################################
+########################################################################################
+
+# TOY ROTTING BANDIT
+
+###############################################
+'''This does not inherit from abstract classroom because it's not a teacher-stu
+dent framework. This toy problem comes from the original rotting bandit paper:
+"use Normal distributions with σ 2 = 0.2, and T = 30, 000.
+Non-Parametric: K = 2. As for the expected rewards: μ 1 (n) = 0.5, ∀n, and μ 2 (n) = 1 for its first
+7, 500 pulls and 0.4 afterwards:
+'''
+class ToyRottingProblem:
+    def __init__(self):
+        self.K = 2
+        self.sigma = np.sqrt(0.2)
+        self.T = 30000
+        self.t = 0
+
+    def reset(self):
+        self.__init__()
+
+    def step(self, chosen_arm):
+        assert chosen_arm in [0, 1]
+        zero_centered_reward = np.random.randn(1) * self.sigma
+        if chosen_arm == 0:
+            reward = zero_centered_reward + 0.5
+        elif chosen_arm == 1 and self.t<7500:
+            reward = zero_centered_reward + 1
+        else:
+            reward = zero_centered_reward + 0.4
+        self.t += 1
+        if not self.t < 1+self.T:
+            print('Problem has ended, resetting')
+            self.reset()
+            return None
+        return reward
+
+
 
 
 ########################################################################################

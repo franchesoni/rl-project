@@ -88,6 +88,61 @@ class AbstractTeacher:
         raise NotImplementedError
 
 
+import sys
+sys.path.append('/home/franchesoni/Documents/mva/mva/rl/project/raw_ucb/')
+from raw_ucb import EFF_RAWUCB
+
+class RAWUCBTeacher(AbstractTeacher):
+    def __init__(self, n_actions=1, sigma=1):
+        super().__init__(n_actions)
+        self.policy = EFF_RAWUCB(n_actions, subgaussian=sigma, alpha=1.4)
+
+    def give_task(self, last_reward):
+        '''Returns probabilities over list of actions'''
+        if self.policy.t != 0:
+            self.policy.getReward(self.last_choice, last_reward)
+        else:
+            self.policy.t += 1
+        self.last_choice = self.policy.choice()
+        p = np.zeros(self.n_actions)
+        p[self.last_choice] = 1
+        return p
+
+
+def test_RAWUCB():
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from classroom import ToyRottingProblem
+
+    received_rewards = []
+    choices = []
+    problem = ToyRottingProblem()
+    teacher = RAWUCBTeacher(n_actions=2)
+    reward = 0
+    for timestep in range(problem.T):
+        task_dist = teacher.give_task(reward)
+        choice = np.argmax(task_dist)
+        choices.append(choice)
+        reward = problem.step(chosen_arm=choice)
+        received_rewards.append(reward[0])
+
+    regret = np.array([0.5 if c == 0 else 0 for c in choices[:7500]] + [0.1 if c == 1 else 0 for c in choices[7500:]])
+    cum_regret = np.cumsum(regret)
+    received_rewards = np.array(received_rewards)
+    w = 100
+    plt.plot(received_rewards, '.')
+    plt.plot(np.concatenate((np.ones(7500), np.ones(problem.T-7500)*0.4)), linewidth=4)
+    plt.plot(np.ones(len(received_rewards))*0.5, linewidth=4)
+    plt.plot(np.concatenate((np.zeros(w-1), np.convolve(received_rewards, np.ones(w) / w, 'valid'))))
+    plt.plot(regret, 'x')
+    plt.plot(cum_regret / cum_regret[-1], linewidth=4)
+    plt.legend(['Received rewards', 'Expected reward arm 1', 'Expected reward arm 2', f'Window averaged rewards with w={w}', 'Regret', 'Cummulative regret'])
+    plt.show()
+
+
+
+
+
 
 class CurriculumTeacher(AbstractTeacher):
     def __init__(self, curriculum, n_actions=1):

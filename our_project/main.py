@@ -1,3 +1,4 @@
+
 from cfg import CURRICULUM, N_INTERACTIONS, WRITER
 from classroom import TestAdditionClassroom
 from students import AdditionStudent
@@ -11,7 +12,6 @@ Seed and writer dest are in classroom.py.'''
 
 
 if __name__=='__main__':
-
     WRITER.add_text('Progress', 'Started script')
 
     teacher = CurriculumTeacher(curriculum=CURRICULUM, n_actions=len(CURRICULUM[0]))
@@ -20,4 +20,6 @@ if __name__=='__main__':
 
     for _ in range(N_INTERACTIONS):
         classroom.step()
-    
+
+    # from teachers import test_RAWUCB
+    # test_RAWUCB()

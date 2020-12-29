@@ -4,8 +4,8 @@
 "TRAIN_SIZE": 10000,
 "VAL_SIZE": 1000,
 "BATCH_SIZE": 320,
-"EPOCHS": 10,
+"EPOCHS": 100,
 "NUM_CHARS": 12,
 "LR": 0.001,
-"SUMMARY_WRITER_PATH": "./runs/directly_two",
+"SUMMARY_WRITER_PATH": "./runs/directly_two_lala",
 "SEED": 42}

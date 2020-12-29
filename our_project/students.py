@@ -94,6 +94,8 @@ class AbstractStudent:
             WRITER.add_scalar('Loss/Train_loss', loss.detach().item())
 
 
+'''Particular students train different models. But the problem is formulated
+at task'''
 
 class AdditionStudent(AbstractStudent):
     def __init__(self, hidden_size=128):
