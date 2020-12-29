@@ -140,6 +140,7 @@ class AdditionLSTM(torch.nn.Module):
         self.linear = torch.nn.Linear(
             in_features=128, out_features=onehot_features
         )
+        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, encoded_input):
         '''Forward pass: pass the input through a LSTM, uses that repeated
@@ -153,8 +154,9 @@ class AdditionLSTM(torch.nn.Module):
         h_ts, (h_n, c_n) = self.lstm_decode(
             expanded_h_n
         )  # we change batch order: (seq, batch, feature)
-        pre_probas = self.linear(
+        x = self.linear(
             torch.squeeze(h_ts)
         )  # squeeze in order to compute softmax in the correct axis
-        return torch.nn.functional.softmax(pre_probas, dim=1)
+        x = self.softmax(pre_probas)
+        return x
 
