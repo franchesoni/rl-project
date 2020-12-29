@@ -1,12 +1,11 @@
-N_INTERACTIONS = 3
+N_INTERACTIONS = 1
 # Addition config
-CURRICULUM = [[0, 0, 1]]
-MAX_DIGITS = 3
-TRAIN_SIZE=1000
+CURRICULUM = [[0, 1]]
+MAX_DIGITS = 2
+TRAIN_SIZE=10000
 VAL_SIZE=1000
-BATCH_SIZE=32
+BATCH_SIZE=320
 EPOCHS=100
-MAX_DIGITS=3
 NUM_CHARS = 12
 LR=0.001
 #####################
@@ -28,5 +27,5 @@ seed_everything(SEED)
 ##################
 # os.system('rm -rf /home/franchesoni/Documents/mva/mva/rl/project/runs')
 from torch.utils.tensorboard import SummaryWriter
-WRITER = SummaryWriter()
+WRITER = SummaryWriter('./runs/directly_two')
 ###############
