@@ -66,24 +66,24 @@ class AbstractTask:
     def generate_data(self, dist, size):
         """Generates X and y arrays of examples of size=size drawing examples
         from pdf dist"""
-        NotImplementedError(
+        raise NotImplementedError(
             "This is an abstract class, you should implement this method"
         )
 
     def loss_fn(self, pred, y):
-        NotImplementedError(
+        raise NotImplementedError(
             "This is an abstract class, you should implement this method"
         )
 
     def get_observation(self, model):
         """Computes the observation given model. This should be reimplemented
         inside Student if it's too inefficient to make a whole new computation."""
-        NotImplementedError(
+        raise NotImplementedError(
             "This is an abstract class, you should implement this method"
         )
 
     def val_score_fn(self, val_pred, val_y, val_lens):
-        NotImplementedError(
+        raise NotImplementedError(
             "This is an abstract class, you should implement this method"
         )
 
@@ -91,7 +91,7 @@ class AbstractTask:
         """Returns bool telling if val score is enough to finish. It assumes
         the finishing criterium is based on val score. It also finishes when
         n_epochs is completed"""
-        NotImplementedError(
+        raise NotImplementedError(
             "This is an abstract class, you should implement this method"
         )
 
