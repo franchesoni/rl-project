@@ -1,9 +1,8 @@
-from cfg import LR, MAX_DIGITS, NUM_CHARS
-import tqdm
-
 import numpy
 import torch
+import tqdm
 
+from cfg import LR, MAX_DIGITS, NUM_CHARS
 from classroom import WRITER
 
 '''Welcome to the student's site. We have an abstract class of what is a
