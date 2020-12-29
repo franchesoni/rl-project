@@ -182,7 +182,7 @@ class AdditionTask(AbstractTask):
             query = "{}+{}".format(a, b).ljust(self.maxlen)
             ans = str(int(a) + int(b))
             # Answers can be of maximum size DIGITS + 1
-            ans += " " * (self.max_digits + 1 - len(ans))
+            ans = ans.ljust(self.max_digits + 1)
             if self.invert:
                 query = query[
                     ::-1
