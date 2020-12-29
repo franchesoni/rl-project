@@ -1,10 +1,10 @@
-import numpy as np
 import os
-import random
+import warnings
+
+import numpy as np
 import torch
 
 from cfg import BATCH_SIZE, EPOCHS, MAX_DIGITS, NUM_CHARS, TRAIN_SIZE, VAL_SIZE, WRITER
-###############
 
 
 '''This is the longest and ugliest code. Have a look at <AbstractClassroom>
@@ -210,12 +210,8 @@ class AdditionTask(AbstractTask):
 
     def accuracy_per_length(self, y_pred, y, lengths):
         """Computes accuracy using model output """
-        y = np.argmax(
-            y, axis=-1
-        )  # target indices  (batch, max_digits+1)
-        p = np.argmax(
-            y_pred, axis=-1
-        )  # inferred indices  (batch, max_digits+1)
+        y = np.argmax(y, axis=-1)  # target indices  (batch, max_digits+1)
+        p = np.argmax(y_pred, axis=-1)  # inferred indices  (batch, max_digits+1)
         accs = []
         for i in range(self.max_digits):
             yl = y[
@@ -226,9 +222,9 @@ class AdditionTask(AbstractTask):
                 yl == pl, axis=1
             )  # set to true those that coincide
             accs.append(np.mean(tf))
-        RuntimeWarning(
-            "accuracy per length computed without pytorch (using numpy only)"
-        )
+        warnings.warn(
+            "accuracy per length computed without pytorch (using numpy only)",
+            RuntimeWarning)
         return np.array(accs)
 
     def accuracy_per_length_torch(self, y_pred, y, lengths):
