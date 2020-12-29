@@ -157,6 +157,6 @@ class AdditionLSTM(torch.nn.Module):
         x = self.linear(
             torch.squeeze(h_ts)
         )  # squeeze in order to compute softmax in the correct axis
-        x = self.softmax(pre_probas)
+        x = self.softmax(x)
         return x
 
