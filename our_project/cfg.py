@@ -8,7 +8,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 #####################
 
-with open("./our_project/config.json", "r") as f:
+with open("config.json", "r") as f:
     config = json.load(f)
 
 N_INTERACTIONS = config["N_INTERACTIONS"]
