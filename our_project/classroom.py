@@ -213,13 +213,9 @@ class AdditionTask(AbstractTask):
         p = np.argmax(y_pred, axis=-1)  # inferred indices  (batch, max_digits+1)
         accs = []
         for i in range(self.max_digits):
-            yl = y[
-                lengths == i + 1
-            ]  # select those labels with length
+            yl = y[lengths == i + 1]  # select those labels with length
             pl = p[lengths == i + 1]
-            tf = np.all(
-                yl == pl, axis=1
-            )  # set to true those that coincide
+            tf = np.all(yl == pl, axis=1)  # set to true those that coincide
             accs.append(np.mean(tf))
         warnings.warn(
             "accuracy per length computed without pytorch (using numpy only)",
@@ -228,21 +224,13 @@ class AdditionTask(AbstractTask):
 
     def accuracy_per_length_torch(self, y_pred, y, lengths):
         """Computes accuracy using model output """
-        y = torch.argmax(
-            y, dim=-1
-        )  # target indices  (batch, max_digits+1)
-        p = torch.argmax(
-            y_pred, dim=-1
-        )  # inferred indices  (batch, max_digits+1)
+        y = torch.argmax(y, dim=-1)  # target indices  (batch, max_digits+1)
+        p = torch.argmax(y_pred, dim=-1)  # inferred indices  (batch, max_digits+1)
         accs = torch.Tensor(self.max_digits)
         for i in range(self.max_digits):
-            yl = y[
-                lengths == i + 1
-            ]  # select those labels with length
+            yl = y[lengths == i + 1]  # select those labels with length
             pl = p[lengths == i + 1]
-            tf = (
-                torch.all(yl == pl, dim=1)
-            )  # set to true those that coincide
+            tf = (torch.all(yl == pl, dim=1))  # set to true those that coincide
             accs[i] = torch.mean((tf*1).float())
         return accs
 
