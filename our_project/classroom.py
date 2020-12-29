@@ -184,9 +184,7 @@ class AdditionTask(AbstractTask):
             # Answers can be of maximum size DIGITS + 1
             ans = ans.ljust(self.max_digits + 1)
             if self.invert:
-                query = query[
-                    ::-1
-                ]  # spaces first. It could have zeros first too.
+                query = query[::-1]  # spaces first. It could have zeros first too.
             questions.append(query)
             expected.append(ans)
             lengths.append(gen_digits)
