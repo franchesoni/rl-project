@@ -20,7 +20,7 @@ class AbstractStudent:
     def learn_from_task(self, task):
         # check that it was correctly initialized
         assert self.model is not None
-        assert self.model is not None
+        assert self.optimizer is not None
 
         # intialize validation variables and data
         val_data = task.generate_data(task.val_dist, task.val_size)
