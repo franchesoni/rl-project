@@ -283,38 +283,30 @@ class CharacterTable(object):
     + Decode a vector of probabilities to their character output
     """
 
-    def __init__(
-        self, chars, maxlen
-    ):  # one hot encoded vector dim: (maxlen, #chars)
-        self.chars = sorted(
-            set(chars)
-        )  # sorted list of chars without duplicates
-        self.from_char_indices = dict(
-            (c, i) for i, c in enumerate(self.chars)
-        )  # access dict with char to find index as x_ind = self.char_indices['x']
-        self.from_indices_char = dict(
-            (i, c) for i, c in enumerate(self.chars)
-        )  # access dict with index to find char. It should be the same than self.chars[ind]
+    def __init__(self, chars, maxlen):
+        """ one hot encoded vector dim: (maxlen, #chars)
+        """
         self.maxlen = maxlen
+        # sorted list of chars without duplicates
+        self.chars = sorted(set(chars))
+        # access dict with char to find index as x_ind = self.char_indices['x']
+        self.char_to_indices = dict((c, i) for i, c in enumerate(self.chars))
+        # access dict with index to find char. It should be the same than self.chars[ind]
+        self.indices_to_char = dict((i, c) for i, c in enumerate(self.chars))
 
-    def encode(
-        self, C, maxlen=None
-    ):  # encode string C as one-hot encoding
+    def encode(self, C, maxlen=None):
+        """encode string C as one-hot encoding
+        """
         assert type(C) == str  # check type
         maxlen = maxlen or self.maxlen  # overwrite maxlen if passed
-        assert (
-            len(C) <= maxlen
-        )  # we can not encode a sequence larger than maxlen
-        X = np.zeros(
-            (maxlen, len(self.chars))
-        )  # one hot encoding dim: (maxlen, #chars)
-        for i, c in enumerate(C):  # for each character in string C
-            X[
-                i, self.from_char_indices[c]
-            ] = 1  # set a 1 in ith row and corresponding column
+        assert len(C) <= maxlen, "can not encode a sequence larger than maxlen"
+        X = np.zeros((maxlen, len(self.chars)))  # one hot encoding dim: (maxlen, #chars)
+        for i, c in enumerate(C):
+            # set a 1 in ith row and corresponding column
+            X[i, self.char_to_indices[c]] = 1
         return X
 
     def decode(self, X):
         X = X.argmax(axis=-1)  # gets first index of greatest integer
-        return "".join(self.from_indices_char[x] for x in X)
+        return "".join(self.indices_to_char[x] for x in X)
 
