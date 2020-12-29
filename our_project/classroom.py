@@ -1,8 +1,9 @@
-from cfg import BATCH_SIZE, EPOCHS, MAX_DIGITS, NUM_CHARS, TRAIN_SIZE, VAL_SIZE, WRITER
-import random
 import numpy as np
 import os
+import random
 import torch
+
+from cfg import BATCH_SIZE, EPOCHS, MAX_DIGITS, NUM_CHARS, TRAIN_SIZE, VAL_SIZE, WRITER
 ###############
 
 
