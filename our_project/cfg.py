@@ -1,6 +1,7 @@
 import json
 import random
 import os
+import shutil
 
 import numpy as np
 import torch
@@ -23,6 +24,8 @@ LR = config["LR"]
 SUMMARY_WRITER_PATH = config["SUMMARY_WRITER_PATH"]
 SEED = config["SEED"]
 TEACHER_NAME = config["TEACHER_NAME"]
+if os.path.isdir(SUMMARY_WRITER_PATH):
+    shutil.rmtree(SUMMARY_WRITER_PATH)
 WRITER = SummaryWriter(SUMMARY_WRITER_PATH)
 
 with open(os.path.join(SUMMARY_WRITER_PATH, "config.json"), "w") as f:

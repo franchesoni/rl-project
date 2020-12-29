@@ -49,7 +49,7 @@ class AbstractStudent:
                     task.val_score_fn(val_pred, val_y, val_lens)
                 )
 
-            WRITER.add_scalar('Loss/Val_score', val_scores[-1])
+            WRITER.add_scalar('Loss/Val_epoch_score', val_scores[-1])
 
             # check if finished
             if task.finished(val_scores[-1]):
@@ -91,7 +91,8 @@ class AbstractStudent:
             loss.backward()
             self.optimizer.step()
 
-            WRITER.add_scalar('Loss/Train_loss', loss.detach().item())
+            WRITER.add_scalar('Loss/Train_batch_loss', loss.detach().item())
+        WRITER.add_scalar('Loss/Train_epoch_loss', loss.detach().item())
 
 
 '''Particular students train different models. But the problem is formulated

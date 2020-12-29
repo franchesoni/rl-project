@@ -1,7 +1,50 @@
-import numpy as np
 from collections import deque
+import sys
+sys.path.append("/home/franchesoni/Documents/mva/mva/rl/project/raw_ucb/")
+
+import numpy as np
 
 from classroom import WRITER
+from raw_ucb import EFF_RAWUCB
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+
+
+
+
+class AbstractTeacher:
+    def __init__(self, n_actions=1):
+        self.n_actions = n_actions
+
+    def give_task(self, last_rewards):
+        """Returns probabilities over list of actions"""
+        raise NotImplementedError
+
+###############################################################################
+###############################################################################
+###############################################################################
+
+
+
+
+class CurriculumTeacher(AbstractTeacher):
+    def __init__(self, curriculum, n_actions=1):
+        """
+        'curriculum' e.g. list of lists as defined in DIGITS_DIST_EXPERIMENTS
+        """
+        super().__init__(n_actions)
+        self.curriculum = curriculum
+        self.curriculum_step = 0
+
+    def give_task(self, last_rewards):
+        p = self.curriculum[self.curriculum_step]
+        if last_rewards == "A":  # advance when reward is 'A'
+            self.curriculum_step += 1
+        return p
+
 
 """Franco comment:
 This first set of functions generate "curriculums". A curriculum is a
@@ -73,6 +116,7 @@ assert gen_curriculum_combined(4) == DIGITS_DIST_EXPERIMENTS["combined"]
 ###############################################################################
 
 
+
 class EpsilonGreedyPolicy:
     def __init__(self, epsilon=0.01):
         self.epsilon = epsilon
@@ -107,47 +151,23 @@ class BoltzmannPolicy:
 class ThompsonPolicy(EpsilonGreedyPolicy):  # don't be alarmed, thompson policy is implemented inside sampling
     pass
 
-
-class AbstractTeacher:
-    def __init__(self, n_actions=1):
-        self.n_actions = n_actions
-
-    def give_task(self, last_rewards):
-        """Returns probabilities over list of actions"""
-        raise NotImplementedError
-
-
-class CurriculumTeacher(AbstractTeacher):
-    def __init__(self, curriculum, n_actions=1):
-        """
-        'curriculum' e.g. list of lists as defined in DIGITS_DIST_EXPERIMENTS
-        """
-        super().__init__(n_actions)
-        self.curriculum = curriculum
-        self.curriculum_step = 0
-
-    def give_task(self, last_rewards):
-        p = self.curriculum[self.curriculum_step]
-        if last_rewards == "A":  # advance when reward is 'A'
-            self.curriculum_step += 1
-        return p
-
-
 class OnlineSlopeBanditTeacher(AbstractTeacher):
-    def __init__(self, policy=BoltzmannPolicy, n_actions=1, lr=0.1, absolute=False):
+    def __init__(self, policy=BoltzmannPolicy(), n_actions=1, lr=0.1, absolute=False):
         super().__init__(n_actions)
         self.policy = policy
         self.lr = lr
-        self.abs_ = absolute
+        self.absolute = absolute
         self.Q = np.zeros(n_actions)
 
     def give_task(self, last_rewards):
-        self.Q = self.Q + self.lr * (last_rewards - self.Q)
+        if last_rewards:
+            self.Q = self.Q + self.lr * (last_rewards - self.Q)
         return self.policy(np.abs(self.Q) if self.absolute else self.Q)
+    
 
 
 class SamplingTeacher(AbstractTeacher):
-    def __init__(self, policy=ThompsonPolicy, n_actions=1, window_size=10, absolute=False):
+    def __init__(self, policy=ThompsonPolicy(), n_actions=1, window_size=10, absolute=False):
         super().__init__(n_actions)
         self.policy = policy
         self.window_size = window_size
@@ -179,9 +199,6 @@ class SamplingTeacher(AbstractTeacher):
 
 ###############################################################################
 
-import sys
-sys.path.append("/home/franchesoni/Documents/mva/mva/rl/project/raw_ucb/")
-from raw_ucb import EFF_RAWUCB
 
 
 class RAWUCBTeacher(AbstractTeacher):

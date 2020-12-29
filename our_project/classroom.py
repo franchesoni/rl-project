@@ -36,7 +36,8 @@ class AbstractClassroom:
         obs = self.student.learn_from_task(task)
         self.reward = self.compute_reward(obs)
 
-        WRITER.add_scalar("Classroom reward", self.reward)
+        WRITER.add_scalars("Classroom observations", {i:ob for ob in obs})
+        WRITER.add_scalars("Classroom rewards", {i:r for r in self.reward})
 
 
 """The abstract task has the training parameters for the student learning. It
@@ -148,7 +149,7 @@ class AdditionClassroom(AbstractClassroom):
     def generate_task(self, task_dist):
         """Generates a new task according to task_dist. Task dist should be
         a one hot vector when all work is finished."""
-        val_dist = np.zeros_like(task_dist)
+        val_dist = np.zeros_like(task_dist)  # validation distribution is on final task by default
         val_dist[-1] = 1  # final task
         task = AdditionTask(
             train_dist=task_dist,

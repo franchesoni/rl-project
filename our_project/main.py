@@ -21,6 +21,7 @@ def run_specific_teacher_addition(teacher_name=TEACHER_NAME):
     student = AdditionStudent()
     classroom = AdditionClassroom(teacher=teacher, student=student)
     for _ in range(N_INTERACTIONS):
+        # breakpoint()
         classroom.step()
 
 if __name__=='__main__':
