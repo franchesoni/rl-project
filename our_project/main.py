@@ -16,7 +16,6 @@ if __name__=='__main__':
 
     teacher = CurriculumTeacher(curriculum=CURRICULUM, n_actions=len(CURRICULUM[0]))
     student = AdditionStudent()
-    # edit TestAdditionClassroom class to change training properties
     classroom = TestAdditionClassroom(teacher=teacher, student=student)
 
     for _ in range(N_INTERACTIONS):
