@@ -85,7 +85,7 @@ class AbstractTeacher:
 
     def give_task(self, last_reward):
         '''Returns probabilities over list of actions'''
-        NotImplementedError
+        raise NotImplementedError
 
 
 
@@ -109,7 +109,7 @@ class CurriculumTeacher(AbstractTeacher):
 
 class OnlineSlopeBanditTeacher:
     def __init__(self, policy, num_actions, lr=0.1, abs=False):
-        NotImplementedError
+        raise NotImplementedError
         self.policy = policy
         self.lr = lr
         self.abs = abs
@@ -135,7 +135,7 @@ class SamplingTeacher:
     def __init__(
         self, env, policy, window_size=10, abs=False, writer=None
     ):
-        NotImplementedError
+        raise NotImplementedError
         self.env = env
         self.policy = policy
         self.window_size = window_size
