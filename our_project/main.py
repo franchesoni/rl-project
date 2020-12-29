@@ -1,7 +1,7 @@
 from cfg import CURRICULUM, N_INTERACTIONS, WRITER
+from classroom import TestAdditionClassroom
 from students import AdditionStudent
 from teachers import CurriculumTeacher
-from classroom import TestAdditionClassroom
 
 
 '''Welcome to the main script! The _main_ idea here (pun intended) is to 
@@ -16,7 +16,8 @@ if __name__=='__main__':
 
     teacher = CurriculumTeacher(curriculum=CURRICULUM, n_actions=len(CURRICULUM[0]))
     student = AdditionStudent()
-    classroom = TestAdditionClassroom(teacher=teacher, student=student)  # edit this class to change training properties
+    # edit TestAdditionClassroom class to change training properties
+    classroom = TestAdditionClassroom(teacher=teacher, student=student)
 
     for _ in range(N_INTERACTIONS):
         classroom.step()
