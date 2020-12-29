@@ -102,7 +102,7 @@ class CurriculumTeacher(AbstractTeacher):
         p = self.curriculum[self.curriculum_step]
         if last_reward == 'A':  # advance when reward is 'A'
             self.curriculum_step += 1
-        return np.random.choice(range(len(p)), size=1, p=p)
+        return p
 
 
 
