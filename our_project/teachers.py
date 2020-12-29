@@ -108,18 +108,18 @@ class CurriculumTeacher(AbstractTeacher):
 
 
 class OnlineSlopeBanditTeacher:
-    def __init__(self, policy, num_actions, lr=0.1, abs=False):
+    def __init__(self, policy, num_actions, lr=0.1, abs_=False):
         raise NotImplementedError
         self.policy = policy
         self.lr = lr
-        self.abs = abs
+        self.abs_ = abs_
         self.Q = np.zeros(num_actions)
         self.prevr = np.zeros(num_actions)
 
 
     def teach(self, num_timesteps=2000):
         for t in range(num_timesteps):
-            p = self.policy(np.abs(self.Q) if self.abs else self.Q)
+            p = self.policy(np.abs(self.Q) if self.abs_ else self.Q)
             r, train_done, val_done = self.env.step(p)
             if val_done:
                 return self.env.model.epochs
@@ -133,13 +133,13 @@ class OnlineSlopeBanditTeacher:
 
 class SamplingTeacher:
     def __init__(
-        self, env, policy, window_size=10, abs=False, writer=None
+        self, env, policy, window_size=10, abs_=False, writer=None
     ):
         raise NotImplementedError
         self.env = env
         self.policy = policy
         self.window_size = window_size
-        self.abs = abs
+        self.abs_ = abs_
         self.writer = writer
         self.dscores = deque(maxlen=window_size)
         self.prevr = np.zeros(self.env.num_actions)
@@ -158,7 +158,7 @@ class SamplingTeacher:
             else:
                 slopes = np.ones(self.env.num_actions)
 
-            p = self.policy(np.abs(slopes) if self.abs else slopes)
+            p = self.policy(np.abs(slopes) if self.abs_ else slopes)
             r, train_done, val_done = self.env.step(p)
             if val_done:
                 return self.env.model.epochs
