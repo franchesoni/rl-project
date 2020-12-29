@@ -179,8 +179,7 @@ class AdditionTask(AbstractTask):
             a, b = f(), f()
 
             # Pad the data with spaces such that it is always MAXLEN
-            q = "{}+{}".format(a, b)
-            query = q + " " * (self.maxlen - len(q))
+            query = "{}+{}".format(a, b).ljust(self.maxlen)
             ans = str(int(a) + int(b))
             # Answers can be of maximum size DIGITS + 1
             ans += " " * (self.max_digits + 1 - len(ans))
