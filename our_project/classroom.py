@@ -36,8 +36,9 @@ class AbstractClassroom:
         obs = self.student.learn_from_task(task)
         self.reward = self.compute_reward(obs)
 
-        WRITER.add_scalars("Classroom observations", {i:ob for ob in obs})
-        WRITER.add_scalars("Classroom rewards", {i:r for r in self.reward})
+        WRITER.add_scalars("Classroom/observations", {str(i):ob for i, ob in enumerate(obs)})
+        WRITER.add_scalars("Classroom/rewards", {str(i):r for i, r in enumerate(self.reward)})
+        WRITER.add_scalars("Classroom/distribution", {str(i):d for i, d in enumerate(task_dist)})
 
 
 """The abstract task has the training parameters for the student learning. It
@@ -162,9 +163,10 @@ class AdditionClassroom(AbstractClassroom):
         )
         return task
 
-    def compute_reward_diff(self, obs):
+    def compute_reward_diff(self, obs, warn=False):
         self.past_obs.append(obs)
-        warnings.warn(RuntimeWarning('This is growing memory'))
+        if warn:
+            warnings.warn(RuntimeWarning('This is growing memory'))
         return self.past_obs[-1] - self.past_obs[-2]
 
     def compute_reward(self, obs):
@@ -237,7 +239,7 @@ class AdditionTask(AbstractTask):
             y[i] = self.ctable.encode(sentence, maxlen=self.max_digits + 1)
         return X, y, np.array(lengths)
 
-    def accuracy_per_length(self, y_pred, y, lengths):
+    def accuracy_per_length(self, y_pred, y, lengths, warn=False):
         """Computes accuracy using model output """
         y = np.argmax(y, axis=-1)  # target indices  (batch, max_digits+1)
         p = np.argmax(y_pred, axis=-1)  # inferred indices  (batch, max_digits+1)
@@ -247,10 +249,11 @@ class AdditionTask(AbstractTask):
             pl = p[lengths == i + 1]
             tf = np.all(yl == pl, axis=1)  # set to true those that coincide
             accs.append(np.mean(tf))
-        warnings.warn(
-            "accuracy per length computed without pytorch (using numpy only)",
-            RuntimeWarning,
-        )
+        if warn:
+            warnings.warn(
+                "accuracy per length computed without pytorch (using numpy only)",
+                RuntimeWarning,
+            )
         return np.array(accs)
 
     def full_number_accuracy(self, y_pred, y_true):
@@ -276,9 +279,8 @@ class AdditionTask(AbstractTask):
         val_data = self.generate_data(self.uniform_dist, 1000)
         val_X, val_y, val_lens = val_data
         val_X = torch.from_numpy(val_X).float()
-        val_y = torch.from_numpy(val_y).float()
         pred = model(val_X).transpose(0, 1)
-        return self.accuracy_per_length(pred, val_y, val_lens)
+        return self.accuracy_per_length(pred.detach().numpy(), val_y, val_lens)
 
     def val_score_fn(self, val_pred, val_y, val_lens):
         return self.full_number_accuracy(val_pred, val_y)

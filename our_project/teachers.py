@@ -160,7 +160,7 @@ class OnlineSlopeBanditTeacher(AbstractTeacher):
         self.Q = np.zeros(n_actions)
 
     def give_task(self, last_rewards):
-        if last_rewards:
+        if last_rewards is not None:
             self.Q = self.Q + self.lr * (last_rewards - self.Q)
         return self.policy(np.abs(self.Q) if self.absolute else self.Q)
     
@@ -173,11 +173,13 @@ class SamplingTeacher(AbstractTeacher):
         self.window_size = window_size
         self.absolute = absolute
         self.dscores = deque(maxlen=window_size)
-        self.prevr = np.zeros(self.env.num_actions)
+        self.prevr = np.zeros(n_actions)
+        self.n_actions = n_actions
 
     def give_task(self, last_rewards):
-        self.dscores.append(last_rewards)  # last reward should be an array with one reward per arm
-        if len(self.dscores) > 0:  # if enough values in deque
+        if last_rewards is not None:
+            self.dscores.append(last_rewards)  # last reward should be an array with one reward per arm
+        if len(self.dscores) > 1:  # if enough values in deque
             if isinstance(self.policy, ThompsonPolicy):  # this is totally fake, thompson policy is implemented here
                 slopes = [
                     np.random.choice(drs)
@@ -186,7 +188,7 @@ class SamplingTeacher(AbstractTeacher):
             else:
                 slopes = np.mean(self.dscores, axis=0)
         else:
-            slopes = np.ones(self.env.num_actions)
+            slopes = np.ones(self.n_actions)
         return self.policy(np.abs(slopes) if self.absolute else slopes)
 
 

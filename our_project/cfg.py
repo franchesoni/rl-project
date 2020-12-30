@@ -24,6 +24,7 @@ LR = config["LR"]
 SUMMARY_WRITER_PATH = config["SUMMARY_WRITER_PATH"]
 SEED = config["SEED"]
 TEACHER_NAME = config["TEACHER_NAME"]
+SAVE_MODEL = config["SAVE_MODEL"]  # to see if we multitask
 if os.path.isdir(SUMMARY_WRITER_PATH):
     shutil.rmtree(SUMMARY_WRITER_PATH)
 WRITER = SummaryWriter(SUMMARY_WRITER_PATH)

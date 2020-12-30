@@ -29,7 +29,6 @@ class AbstractStudent:
         val_y = torch.from_numpy(val_y).float().to(self.device)
         val_scores = []
 
-        WRITER.add_text('Progress', 'Just before starting first epoch')
         # main training loop
         for n_epoch in tqdm.tqdm(range(task.epochs)):
             # training part
@@ -48,15 +47,16 @@ class AbstractStudent:
                 val_scores.append(
                     task.val_score_fn(val_pred, val_y, val_lens)
                 )
+            WRITER.add_scalar('Student/Val_epoch_score', val_scores[-1])
 
-            WRITER.add_scalar('Loss/Val_epoch_score', val_scores[-1])
+            observation = task.get_observation(self.model)
+            WRITER.add_scalars('Student/observations', {str(i):ob for i, ob in enumerate(observation)})
 
             # check if finished
             if task.finished(val_scores[-1]):
                 break
 
         # output observation of trained model
-        observation = task.get_observation(self.model)
         return observation
 
     def _train_epoch(self, loss_fn, train_data, batch_size=1):
@@ -91,8 +91,8 @@ class AbstractStudent:
             loss.backward()
             self.optimizer.step()
 
-            WRITER.add_scalar('Loss/Train_batch_loss', loss.detach().item())
-        WRITER.add_scalar('Loss/Train_epoch_loss', loss.detach().item())
+            WRITER.add_scalar('Student/Train_batch_loss', loss.detach().item())
+        WRITER.add_scalar('Student/Train_epoch_loss', loss.detach().item())
 
 
 '''Particular students train different models. But the problem is formulated
