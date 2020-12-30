@@ -1,6 +1,5 @@
 from collections import deque
 import sys
-sys.path.append("/home/franchesoni/Documents/mva/mva/rl/project/raw_ucb/")
 
 import numpy as np
 
