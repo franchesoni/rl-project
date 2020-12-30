@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 from classroom import WRITER
-from raw_ucb import EFF_RAWUCB
+from raw_ucb.raw_ucb import EFF_RAWUCB
 
 
 ###############################################################################
