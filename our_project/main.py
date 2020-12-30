@@ -29,17 +29,32 @@ def run_specific_teacher_addition(teacher_name=TEACHER_NAME):
 
     if SAVE_MODEL:
         torch.save(student.model.state_dict(), SUMMARY_WRITER_PATH)
-if __name__=='__main__':
 
+def profile(function):  # I don't know where to put this
+    '''Insights about time:
+    - more than half of the time is currently located in
+    get_observations (that is inside the training loop only for logging). This
+    relative importance could be avoided if train_size is larger.
+    - the processing time is similarly distributed between generate data and 
+    the neural network processing.
+    - teachers have little to no overhead.
+    - config: {"N_INTERACTIONS": 10,"CURRICULUM": [[0, 0, 0, 1]], "MAX_DIGITS": 4, "TRAIN_SIZE": 100, "VAL_SIZE": 100, "BATCH_SIZE": 10, "EPOCHS": 10,
+    '''
     import cProfile, pstats
     profiler = cProfile.Profile()
     profiler.enable()
-    run_specific_teacher_addition()
+    function()
     profiler.disable()
-    stats = pstats.Stats(profiler).sort_stats('cumsum')
-    stats.print_stats()
+    stats = pstats.Stats(profiler).sort_stats('cumtime')
+    stats.print_stats(20)
+    breakpoint()
 
 
+if __name__=='__main__':
+    run_specific_teacher_addition()
+
+
+    # profile(run_specific_teacher_addition)
 
     # # the following now works
     # from teachers import test_RAWUCB

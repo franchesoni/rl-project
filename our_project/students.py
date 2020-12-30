@@ -49,7 +49,7 @@ class AbstractStudent:
                 )
             WRITER.add_scalar('Student/Val_epoch_score', val_scores[-1])
 
-            observation = task.get_observation(self.model)
+            observation = task.get_observation(self.model)  # this takes more than half the time
             WRITER.add_scalars('Student/observations', {str(i):ob for i, ob in enumerate(observation)})
 
             # check if finished

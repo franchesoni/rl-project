@@ -201,6 +201,34 @@ class AdditionTask(AbstractTask):
         assert self.num_chars == NUM_CHARS  # check consistency between scripts
         self.ctable = CharacterTable(self.chars, self.maxlen)
 
+    def shuffle_along_axis(self, a, axis):
+        # from https://stackoverflow.com/a/55317373/8462678
+        idx = np.random.rand(*a.shape).argsort(axis=axis)
+        return np.take_along_axis(a,idx,axis=axis)
+
+
+        # uniform = np.random.rand(size)
+        # cdist = np.cumsum(dist)
+        # n_occurrences = [0]
+        # for i in range(len(cdist)):
+        #     n_occurrences.append(sum(uniform<cdist[i]) - n_occurrences[-1])
+        # n_occurrences = n_occurrences[1:]
+            
+        # X = []
+        # for i, n in enumerate(n_occurrences):
+        #     spaces = np.zeros((n, self.maxlen-2*(i+1)-1, 12))
+        #     spaces[:,:,0] = 1  # put spaces
+        #     pluses = np.zeros((n, 1, 12))
+        #     pluses[:,:,1] = 1
+        #     numbers = np.zeros((n, 2*(i+1), 10))  # 10 digits
+        #     numbers[:, :, 0] = 1  # set some to 1
+        #     numbers = self.shuffle_along_axis(numbers, axis=-1)
+        #     numbers = np.concatenate((np.zeros((n, 2*(i+1), 2)), numbers), axis=2)
+        #     X.append(np.concatenate((spaces, numbers[:,:i+1], pluses, numbers[:,i+1:]), axis=1))
+        # X = np.concatenate(X, axis=0)
+        # np.random.shuffle(X)
+
+
     def generate_data(self, dist, size):
         """Generates onehot encoded batch X of shape (size, maxlen, num_chars)
         and y of shape (size, max_digits+1, num_chars). The order of the one hot
@@ -209,15 +237,13 @@ class AdditionTask(AbstractTask):
         questions = []
         expected = []
         lengths = []
-        while len(questions) < size:
-            gen_digits = 1 + np.random.choice(
-                len(dist), p=dist
-            )  # get a random length in digits according to pdf "dist"
-            f = lambda: "".join(  # this was originally wrapped inside int() but that created sums with different n of digits when randomly chosing '09' and '58' for example.
-                np.random.choice(list("0123456789")) for i in range(gen_digits)
-            )  # random number generator function
-            a, b = f(), f()
-
+        gen_digitss = 1 + np.random.choice(len(dist),size=size,p=dist)
+        numbers = np.random.choice(list('0123456789'), size=sum(gen_digitss)*2)
+        start_ind = 0
+        for i, gen_digits in enumerate(gen_digitss):
+            a = "".join(numbers[start_ind:start_ind+gen_digits])
+            b = "".join(numbers[start_ind+gen_digits:start_ind+2*gen_digits])
+            start_ind += gen_digits*2
             # Pad the data with spaces such that it is always MAXLEN
             query = "{}+{}".format(a, b).ljust(self.maxlen)
             ans = str(int(a) + int(b))
