@@ -1,6 +1,5 @@
 import numpy
 import torch
-import tqdm
 
 from cfg import LR, MAX_DIGITS, NUM_CHARS
 from classroom import WRITER
@@ -33,7 +32,7 @@ class AbstractStudent:
         val_scores = []
 
         # main training loop
-        for n_epoch in tqdm.tqdm(range(task.epochs)):
+        for n_epoch in range(task.epochs):
             # training part
             self.model.train()  # set mode 
             train_data = task.generate_data(  # generate training data

@@ -1,5 +1,6 @@
-
 import torch
+from tqdm import trange
+
 from cfg import CURRICULUM, N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SUMMARY_WRITER_PATH
 from classroom import AdditionClassroom
 from students import AdditionStudent
@@ -23,8 +24,7 @@ def run_specific_teacher_addition(teacher_name=TEACHER_NAME):
 
     student = AdditionStudent()
     classroom = AdditionClassroom(teacher=teacher, student=student)
-    for _ in range(N_INTERACTIONS):
-        # breakpoint()
+    for _ in trange(N_INTERACTIONS):
         classroom.step()
 
     if SAVE_MODEL:
