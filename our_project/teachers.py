@@ -54,6 +54,7 @@ assertions below show the different curricula here defined. The last element
 of the list is the validation distribution."""
 
 DIGITS_DIST_EXPERIMENTS = {  # example curricula for 4 actions
+    "direct": [[0, 0, 0, 1]],
     "baseline": [[1 / 4, 1 / 4, 1 / 4, 1 / 4]],
     "naive": [
         [1, 0, 0, 0],
@@ -76,6 +77,10 @@ DIGITS_DIST_EXPERIMENTS = {  # example curricula for 4 actions
         [1 / 4, 1 / 4, 1 / 4, 1 / 4],
     ],
 }
+
+
+def gen_curriculum_direct(gen_digits):
+    return [[0 if i < gen_digits-1 else 1 for i in range(gen_digits)]]
 
 
 def gen_curriculum_baseline(gen_digits):
@@ -105,6 +110,7 @@ def gen_curriculum_combined(gen_digits):
     ] + gen_curriculum_baseline(gen_digits)
 
 
+assert gen_curriculum_direct(4) == DIGITS_DIST_EXPERIMENTS["direct"]
 assert gen_curriculum_baseline(4) == DIGITS_DIST_EXPERIMENTS["baseline"]
 assert gen_curriculum_naive(4) == DIGITS_DIST_EXPERIMENTS["naive"]
 assert gen_curriculum_mixed(4) == DIGITS_DIST_EXPERIMENTS["mixed"]
