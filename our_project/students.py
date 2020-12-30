@@ -17,6 +17,8 @@ class AbstractStudent:
         self.model = None
         self.optimizer = None
         self.global_step = 0
+        self.train_batch_step = 0
+        self.train_epoch_step = 0
 
     def learn_from_task(self, task):
         # check that it was correctly initialized
@@ -93,8 +95,10 @@ class AbstractStudent:
             loss.backward()
             self.optimizer.step()
 
-            WRITER.add_scalar('Student/Train_batch_loss', loss.detach().item())
-        WRITER.add_scalar('Student/Train_epoch_loss', loss.detach().item())
+            self.train_batch_step += 1
+            WRITER.add_scalar('Student/Train_batch_loss', loss.detach().item(), self.train_batch_step)
+        self.train_epoch_step += 1
+        WRITER.add_scalar('Student/Train_epoch_loss', loss.detach().item(), self.train_epoch_step)
 
 
 '''Particular students train different models. But the problem is formulated
