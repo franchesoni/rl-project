@@ -1,6 +1,6 @@
 **/runs/*
 __pycache__/*
-.vscode/*
+**/.vscode/*
 .DS_Store
 .huskyrc.json
 out
