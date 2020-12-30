@@ -16,6 +16,7 @@ class AbstractStudent:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = None
         self.optimizer = None
+        self.global_step = 0
 
     def learn_from_task(self, task):
         # check that it was correctly initialized
@@ -47,10 +48,11 @@ class AbstractStudent:
                 val_scores.append(
                     task.val_score_fn(val_pred, val_y, val_lens)
                 )
-            WRITER.add_scalar('Student/Val_epoch_score', val_scores[-1])
+            self.global_step += 1
+            WRITER.add_scalar('Student/Val_epoch_score', val_scores[-1], self.global_step)
 
             observation = task.get_observation(self.model)  # this takes more than half the time
-            WRITER.add_scalars('Student/observations', {str(i):ob for i, ob in enumerate(observation)})
+            WRITER.add_scalars('Student/observations', {str(i):ob for i, ob in enumerate(observation)}, self.global_step)
 
             # check if finished
             if task.finished(val_scores[-1]):
@@ -105,7 +107,7 @@ class AdditionStudent(AbstractStudent):
         assert num_chars == NUM_CHARS
         self.model = AdditionLSTM(
             num_chars, hidden_size, MAX_DIGITS
-        )
+        ).to(self.device)
         self.optimizer = torch.optim.Adam(
             self.model.parameters(), lr=LR
         )  # without clipnorm
@@ -129,6 +131,7 @@ class AdditionLSTM(torch.nn.Module):
         + Softmax
         """
         super().__init__()
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.max_digits = max_digits
         self.lstm_encode = torch.nn.LSTM(
             input_size=onehot_features,

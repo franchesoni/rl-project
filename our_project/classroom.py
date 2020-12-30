@@ -17,6 +17,7 @@ class AbstractClassroom:
         self.teacher = teacher
         self.student = student
         self.reward = None
+        self.global_step = 0
 
     def generate_task(self, task_index):
         """Generates a new task according to index"""
@@ -31,14 +32,15 @@ class AbstractClassroom:
         )
 
     def step(self):
+        self.global_step += 1
         task_dist = self.teacher.give_task(self.reward)
         task = self.generate_task(task_dist)
         obs = self.student.learn_from_task(task)
         self.reward = self.compute_reward(obs)
 
-        WRITER.add_scalars("Classroom/observations", {str(i):ob for i, ob in enumerate(obs)})
-        WRITER.add_scalars("Classroom/rewards", {str(i):r for i, r in enumerate(self.reward)})
-        WRITER.add_scalars("Classroom/distribution", {str(i):d for i, d in enumerate(task_dist)})
+        WRITER.add_scalars("Classroom/observations", {str(i):ob for i, ob in enumerate(obs)}, self.global_step)
+        WRITER.add_scalars("Classroom/rewards", {str(i):r for i, r in enumerate(self.reward)}, self.global_step)
+        WRITER.add_scalars("Classroom/distribution", {str(i):d for i, d in enumerate(task_dist)}, self.global_step)
 
 
 """The abstract task has the training parameters for the student learning. It
@@ -304,9 +306,9 @@ class AdditionTask(AbstractTask):
         inside Student if it's too inefficient to make a whole new computation."""
         val_data = self.generate_data(self.uniform_dist, 1000)
         val_X, val_y, val_lens = val_data
-        val_X = torch.from_numpy(val_X).float()
+        val_X = torch.from_numpy(val_X).float().to(model.device)
         pred = model(val_X).transpose(0, 1)
-        return self.accuracy_per_length(pred.detach().numpy(), val_y, val_lens)
+        return self.accuracy_per_length(pred.cpu().detach().numpy(), val_y, val_lens)
 
     def val_score_fn(self, val_pred, val_y, val_lens):
         return self.full_number_accuracy(val_pred, val_y)
