@@ -53,7 +53,7 @@ class AbstractStudent:
             WRITER.add_scalar('Student/Val_epoch_score', val_scores[-1], self.global_step)
 
             observation = task.get_observation(self.model)  # this takes more than half the time
-            WRITER.add_scalars('Student/observations', {str(i):ob for i, ob in enumerate(observation)}, self.global_step)
+            WRITER.add_scalars('Student/observations', {str(i+1):ob for i, ob in enumerate(observation)}, self.global_step)
 
             # check if finished
             if task.finished(val_scores[-1]):
