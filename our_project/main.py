@@ -1,7 +1,7 @@
 import torch
 from tqdm import trange
 
-from cfg import CURRICULUM, N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SUMMARY_WRITER_PATH
+from cfg import CURRICULUM, CURRICULUM_SCHEDULE, N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SUMMARY_WRITER_PATH
 from classroom import AdditionClassroom
 from students import AdditionStudent
 from teachers import CurriculumTeacher, OnlineSlopeBanditTeacher, SamplingTeacher, RAWUCBTeacher
@@ -16,7 +16,7 @@ def run_specific_teacher_addition(teacher_name=TEACHER_NAME):
     if teacher_name == 'online':
         teacher = OnlineSlopeBanditTeacher(n_actions=MAX_DIGITS)
     elif teacher_name == 'curriculum':
-        teacher = CurriculumTeacher(curriculum=CURRICULUM, n_actions=len(CURRICULUM[0]))
+        teacher = CurriculumTeacher(curriculum=CURRICULUM, curriculum_schedule=CURRICULUM_SCHEDULE, n_actions=len(CURRICULUM[0]))
     elif teacher_name == 'sampling':
         teacher = SamplingTeacher(n_actions=MAX_DIGITS)
     elif teacher_name == 'raw':   

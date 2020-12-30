@@ -30,19 +30,37 @@ class AbstractTeacher:
 
 
 class CurriculumTeacher(AbstractTeacher):
-    def __init__(self, curriculum, n_actions=1):
+    def __init__(self, curriculum, curriculum_schedule=None, n_actions=1):
         """
         'curriculum' e.g. list of lists as defined in DIGITS_DIST_EXPERIMENTS
         """
         super().__init__(n_actions)
         self.curriculum = curriculum
         self.curriculum_step = 0
+        self.interaction = 0
+        self.curriculum_schedule = curriculum_schedule
 
     def give_task(self, last_rewards):
+        self.interaction += 1
+        if self.check_next_curriculum_step():
+            self.curriculum_step = min(self.curriculum_step + 1, len(self.curriculum)-1)
         p = self.curriculum[self.curriculum_step]
-        if last_rewards == "A":  # advance when reward is 'A'
-            self.curriculum_step += 1
         return p
+    
+    def check_next_curriculum_step(self):
+        """
+        check whether or not increasing the curriculum step
+        """
+        # first check if not None or empty
+        if self.curriculum_schedule is not None and \
+                self.curriculum_schedule and \
+                self.interaction >= self.curriculum_schedule[0]:
+            self.curriculum_schedule.pop(0)
+            return True
+        return False
+
+
+
 
 
 """Franco comment:

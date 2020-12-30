@@ -14,6 +14,7 @@ with open("config.json", "r") as f:
 
 N_INTERACTIONS = config["N_INTERACTIONS"]
 CURRICULUM = config["CURRICULUM"]
+CURRICULUM_SCHEDULE = config["CURRICULUM_SCHEDULE"]
 MAX_DIGITS = config["MAX_DIGITS"]
 TRAIN_SIZE = config["TRAIN_SIZE"]
 VAL_SIZE = config["VAL_SIZE"]
