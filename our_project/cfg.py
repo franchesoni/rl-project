@@ -7,15 +7,30 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
+import teachers
+
 #####################
+_CURRICULUMS = {  # example curricula for 4 actions
+    "direct": teachers.gen_curriculum_direct,
+    "baseline": teachers.gen_curriculum_baseline,
+    "naive": teachers.gen_curriculum_naive,
+    "mixed": teachers.gen_curriculum_mixed,
+    "combined": teachers.gen_curriculum_combined,
+}
 
 with open("config.json", "r") as f:
     config = json.load(f)
 
 N_INTERACTIONS = config["N_INTERACTIONS"]
-CURRICULUM = config["CURRICULUM"]
-CURRICULUM_SCHEDULE = config["CURRICULUM_SCHEDULE"]
 MAX_DIGITS = config["MAX_DIGITS"]
+CURRICULUM = config["CURRICULUM"]
+if type(CURRICULUM) is str:
+    if CURRICULUM in _CURRICULUMS.keys():
+        CURRICULUM = _CURRICULUMS[CURRICULUM](MAX_DIGITS)
+    else:
+        raise ValueError("{} is not a curriculum.".format(CURRICULUM))
+print(CURRICULUM)
+CURRICULUM_SCHEDULE = config["CURRICULUM_SCHEDULE"]
 TRAIN_SIZE = config["TRAIN_SIZE"]
 VAL_SIZE = config["VAL_SIZE"]
 BATCH_SIZE = config["BATCH_SIZE"]
