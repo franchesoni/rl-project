@@ -69,7 +69,6 @@ def show_addition_examples(model_path, max_digits, n_examples=5, dist="direct"):
     X, y, _ = add_task.generate_data(curriculum, n_examples)
     char_table = CharacterTable("0123456789+ ", 2*max_digits+1)
     x_pred = model(torch.from_numpy(X).float()).detach().numpy().transpose(1,0,2)
-    print("question / prediction / solution")
     for i in range(n_examples):
         query = char_table.decode(X[i])
         sol = char_table.decode(y[i])
@@ -77,7 +76,7 @@ def show_addition_examples(model_path, max_digits, n_examples=5, dist="direct"):
         print("{} = {} ({})".format(query, pred, sol))
 
 if __name__=='__main__':
-    run_specific_teacher_addition()
+    run_specific_teacher_addition(show_addition=False)
 
 
     # profile(run_specific_teacher_addition)
