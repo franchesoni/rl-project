@@ -3,9 +3,9 @@ import os
 import torch
 from tqdm import trange
 
-from cfg import CURRICULUM, CURRICULUM_SCHEDULE, N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SUMMARY_WRITER_PATH
-from classroom import AdditionClassroom
-from students import AdditionStudent
+from cfg import CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE, N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SUMMARY_WRITER_PATH
+from classroom import AdditionClassroom, CharacterTable, AdditionTask
+from students import AdditionStudent, AdditionLSTM
 from teachers import CurriculumTeacher, OnlineSlopeBanditTeacher, SamplingTeacher, RAWUCBTeacher
 
 
@@ -51,6 +51,21 @@ def profile(function):  # I don't know where to put this
     stats.print_stats(20)
     breakpoint()
 
+def show_addition_examples(model_path, max_digits, n_examples):
+    model = AdditionLSTM(max_digits=1)
+    model.load_state_dict(torch.load(model_path))
+    model.eval()
+    curriculum = _CURRICULUMS["direct"](max_digits)[0]
+    add_task = AdditionTask(curriculum, 1000, curriculum, 1000, 1000, 1, max_digits)
+    X, y, _ = add_task.generate_data(curriculum, n_examples)
+    char_table = CharacterTable("0123456789+ ", 2*max_digits+1)
+    x_pred = model(torch.from_numpy(X).float()).detach().numpy().transpose(1,0,2)
+    print("question / prediction / solution")
+    for i in range(n_examples):
+        query = char_table.decode(X[i]).replace(" ", "_")
+        sol = char_table.decode(y[i]).replace(" ", "_")
+        pred = char_table.decode(x_pred[i]).replace(" ", "_")
+        print("{} = {} ({})".format(query, pred, sol))
 
 if __name__=='__main__':
     run_specific_teacher_addition()
