@@ -1,3 +1,5 @@
+import os
+
 import torch
 from tqdm import trange
 
@@ -28,7 +30,7 @@ def run_specific_teacher_addition(teacher_name=TEACHER_NAME):
         classroom.step()
 
     if SAVE_MODEL:
-        torch.save(student.model.state_dict(), SUMMARY_WRITER_PATH)
+        torch.save(student.model.state_dict(), os.path.join(SUMMARY_WRITER_PATH, "model.pt"))
 
 def profile(function):  # I don't know where to put this
     '''Insights about time:
