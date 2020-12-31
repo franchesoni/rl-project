@@ -51,20 +51,25 @@ def profile(function):  # I don't know where to put this
     stats.print_stats(20)
     breakpoint()
 
-def show_addition_examples(model_path, max_digits, n_examples):
-    model = AdditionLSTM(max_digits=1)
+def show_addition_examples(model_path, max_digits, n_examples=5, dist="direct"):
+    model = AdditionLSTM(max_digits=max_digits)
     model.load_state_dict(torch.load(model_path))
     model.eval()
-    curriculum = _CURRICULUMS["direct"](max_digits)[0]
+    if dist == "direct":
+        curriculum = _CURRICULUMS["direct"](max_digits)[0]
+    elif dist == "uniform":
+        curriculum = _CURRICULUMS["baseline"](max_digits)[0]
+    else:
+        raise ValueError("dist {} not in ['direct', 'uniform'].".format(dist))
     add_task = AdditionTask(curriculum, 1000, curriculum, 1000, 1000, 1, max_digits)
     X, y, _ = add_task.generate_data(curriculum, n_examples)
     char_table = CharacterTable("0123456789+ ", 2*max_digits+1)
     x_pred = model(torch.from_numpy(X).float()).detach().numpy().transpose(1,0,2)
     print("question / prediction / solution")
     for i in range(n_examples):
-        query = char_table.decode(X[i]).replace(" ", "_")
-        sol = char_table.decode(y[i]).replace(" ", "_")
-        pred = char_table.decode(x_pred[i]).replace(" ", "_")
+        query = char_table.decode(X[i])
+        sol = char_table.decode(y[i])
+        pred = char_table.decode(x_pred[i])
         print("{} = {} ({})".format(query, pred, sol))
 
 if __name__=='__main__':
