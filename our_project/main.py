@@ -14,7 +14,7 @@ create a classroom, assign a teacher (maybe with a handcrafted curriculum) and
 a student, and then make some interactions.
 Seed and writer dest are in classroom.py.'''
 
-def run_specific_teacher_addition(teacher_name=TEACHER_NAME):
+def run_specific_teacher_addition(teacher_name=TEACHER_NAME, show_addition=False):
     if teacher_name == 'online':
         teacher = OnlineSlopeBanditTeacher(n_actions=MAX_DIGITS)
     elif teacher_name == 'curriculum':
@@ -26,8 +26,12 @@ def run_specific_teacher_addition(teacher_name=TEACHER_NAME):
 
     student = AdditionStudent()
     classroom = AdditionClassroom(teacher=teacher, student=student)
-    for _ in trange(N_INTERACTIONS):
+    for i in trange(N_INTERACTIONS):
         classroom.step()
+        if i%100 == 0 and show_addition:
+            model_path = os.path.join(SUMMARY_WRITER_PATH, "model_{}.pt".format(i))
+            torch.save(student.model.state_dict(), model_path)
+            show_addition_examples(model_path, MAX_DIGITS, n_examples=5, dist="direct")
 
     if SAVE_MODEL:
         torch.save(student.model.state_dict(), os.path.join(SUMMARY_WRITER_PATH, "model.pt"))
