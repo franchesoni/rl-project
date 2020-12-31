@@ -29,7 +29,6 @@ if type(CURRICULUM) is str:
         CURRICULUM = _CURRICULUMS[CURRICULUM](MAX_DIGITS)
     else:
         raise ValueError("{} is not a curriculum.".format(CURRICULUM))
-print(CURRICULUM)
 CURRICULUM_SCHEDULE = config["CURRICULUM_SCHEDULE"]
 TRAIN_SIZE = config["TRAIN_SIZE"]
 VAL_SIZE = config["VAL_SIZE"]
