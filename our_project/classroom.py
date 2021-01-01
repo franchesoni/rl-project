@@ -199,7 +199,7 @@ class AdditionTask(AbstractTask):
         self.invert = invert
         self.maxlen = max_digits + 1 + max_digits
         self.chars = "0123456789+ "
-        self.num_chars = len(sorted(set(self.chars)))
+        self.num_chars = len(self.chars)
         assert self.num_chars == NUM_CHARS  # check consistency between scripts
         self.ctable = CharacterTable(self.chars, self.maxlen)
 
@@ -334,7 +334,8 @@ class CharacterTable(object):
         """
         self.maxlen = maxlen
         # sorted list of chars without duplicates
-        self.chars = sorted(set(chars))
+        # self.chars = sorted(set(chars))
+        self.chars = chars
         # access dict with char to find index as x_ind = self.char_indices['x']
         self.char_to_indices = {c: i for i, c in enumerate(self.chars)}
         # access dict with index to find char. It should be the same than self.chars[ind]
