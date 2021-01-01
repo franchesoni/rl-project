@@ -8,6 +8,7 @@
 "EPOCHS": 10,
 "NUM_CHARS": 12,
 "LR": 0.001,
+"ABSOLUTE": true,
 "SUMMARY_WRITER_PATH": "./runs/three_direct",
 "TEACHER_NAME": "curriculum", 
 "SAVE_MODEL": true,
