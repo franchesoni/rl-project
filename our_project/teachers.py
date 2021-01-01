@@ -73,6 +73,12 @@ of the list is the validation distribution."""
 DIGITS_DIST_EXPERIMENTS = {  # example curricula for 4 actions
     "direct": [[0, 0, 0, 1]],
     "baseline": [[1 / 4, 1 / 4, 1 / 4, 1 / 4]],
+    "incremental": [
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
+    ],
     "naive": [
         [1, 0, 0, 0],
         [0, 1, 0, 0],
@@ -104,6 +110,12 @@ def gen_curriculum_baseline(gen_digits):
     return [[1 / gen_digits for _ in range(gen_digits)]]
 
 
+def gen_curriculum_incremental(gen_digits):
+    return [
+        [1 if i == j else 0 for j in range(gen_digits)] for i in range(gen_digits)
+    ]
+
+
 def gen_curriculum_naive(gen_digits):
     return [
         [1 if i == j else 0 for j in range(gen_digits)] for i in range(gen_digits)
@@ -129,6 +141,7 @@ def gen_curriculum_combined(gen_digits):
 
 assert gen_curriculum_direct(4) == DIGITS_DIST_EXPERIMENTS["direct"]
 assert gen_curriculum_baseline(4) == DIGITS_DIST_EXPERIMENTS["baseline"]
+assert gen_curriculum_incremental(4) == DIGITS_DIST_EXPERIMENTS["incremental"]
 assert gen_curriculum_naive(4) == DIGITS_DIST_EXPERIMENTS["naive"]
 assert gen_curriculum_mixed(4) == DIGITS_DIST_EXPERIMENTS["mixed"]
 assert gen_curriculum_combined(4) == DIGITS_DIST_EXPERIMENTS["combined"]
