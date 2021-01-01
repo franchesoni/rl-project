@@ -3,7 +3,7 @@ import os
 import torch
 from tqdm import trange
 
-from cfg import CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE, N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SUMMARY_WRITER_PATH
+from cfg import CONFIG_FILE, CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE, N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SHOW_ADD, SUMMARY_WRITER_PATH
 from classroom import AdditionClassroom, CharacterTable, AdditionTask
 from students import AdditionStudent, AdditionLSTM
 from teachers import CurriculumTeacher, OnlineSlopeBanditTeacher, SamplingTeacher, RAWUCBTeacher
@@ -14,7 +14,10 @@ create a classroom, assign a teacher (maybe with a handcrafted curriculum) and
 a student, and then make some interactions.
 Seed and writer dest are in classroom.py.'''
 
-def run_specific_teacher_addition(teacher_name=TEACHER_NAME, show_addition=False):
+
+
+def run_specific_teacher_addition(
+        teacher_name=TEACHER_NAME, show_addition=SHOW_ADD, show_freq=10, dist_show="direct"):
     if teacher_name == 'online':
         teacher = OnlineSlopeBanditTeacher(n_actions=MAX_DIGITS)
     elif teacher_name == 'curriculum':
@@ -26,12 +29,14 @@ def run_specific_teacher_addition(teacher_name=TEACHER_NAME, show_addition=False
 
     student = AdditionStudent()
     classroom = AdditionClassroom(teacher=teacher, student=student)
-    for i in trange(N_INTERACTIONS):
+    pbar = trange(N_INTERACTIONS)
+    for i in pbar:
+        pbar.set_description("Processing {}".format(CONFIG_FILE))
         classroom.step()
-        if i%100 == 0 and show_addition:
+        if i % show_freq == 0 and show_addition:
             model_path = os.path.join(SUMMARY_WRITER_PATH, "model_{}.pt".format(i))
             torch.save(student.model.state_dict(), model_path)
-            show_addition_examples(model_path, MAX_DIGITS, n_examples=5, dist="direct")
+            show_addition_examples(model_path, MAX_DIGITS, n_examples=100, dist=dist_show)
 
     if SAVE_MODEL:
         torch.save(student.model.state_dict(), os.path.join(SUMMARY_WRITER_PATH, "model.pt"))
@@ -55,7 +60,7 @@ def profile(function):  # I don't know where to put this
     stats.print_stats(20)
     breakpoint()
 
-def show_addition_examples(model_path, max_digits, n_examples=5, dist="direct"):
+def show_addition_examples(model_path, max_digits, n_examples=5, nb_print=5, dist="direct"):
     model = AdditionLSTM(max_digits=max_digits)
     model.load_state_dict(torch.load(model_path))
     model.eval()
@@ -66,21 +71,19 @@ def show_addition_examples(model_path, max_digits, n_examples=5, dist="direct"):
     else:
         raise ValueError("dist {} not in ['direct', 'uniform'].".format(dist))
     add_task = AdditionTask(curriculum, 1000, curriculum, 1000, 1000, 1, max_digits)
-    X, y, _ = add_task.generate_data(curriculum, n_examples)
+    X, y, lengths = add_task.generate_data(curriculum, n_examples)
     char_table = CharacterTable("0123456789+ ", 2*max_digits+1)
-    x_pred = model(torch.from_numpy(X).float()).detach().numpy().transpose(1,0,2)
-    for i in range(n_examples):
-        query = char_table.decode(X[i])
-        sol = char_table.decode(y[i])
-        pred = char_table.decode(x_pred[i])
+    y = torch.from_numpy(y).flip(dims=[1]).detach().numpy()
+    y_pred = model(torch.from_numpy(X).float()).detach().numpy().transpose(1,0,2)
+    y_pred = torch.from_numpy(y_pred).flip(dims=[1]).detach().numpy()
+    for i in range(min(nb_print, n_examples)):
+        query = char_table.decode(X[i])[::-1]
+        pred = char_table.decode(y_pred[i])[::-1]
+        sol = char_table.decode(y[i])[::-1]
         print("{} = {} ({})".format(query, pred, sol))
+    print(">>> Accuracy: {}\n".format(add_task.accuracy_per_length(y_pred, y, lengths)))
+    return X, y, lengths, model
 
 if __name__=='__main__':
-    run_specific_teacher_addition(show_addition=False)
 
-
-    # profile(run_specific_teacher_addition)
-
-    # # the following now works
-    # from teachers import test_RAWUCB
-    # test_RAWUCB()
+    run_specific_teacher_addition(dist_show="uniform")
