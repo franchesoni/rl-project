@@ -92,6 +92,8 @@ class AbstractStudent:
             pred = self.model(X).transpose(0, 1)
             loss = loss_fn(pred, y, lens)
             loss.backward()
+            # gradient clipping
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 0.1)
             self.optimizer.step()
 
             self.train_batch_step += 1
