@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 from raw_ucb.raw_ucb import EFF_RAWUCB
-
+from cfg import ABSOLUTE
 
 ###############################################################################
 ###############################################################################
@@ -187,7 +187,7 @@ class ThompsonPolicy(EpsilonGreedyPolicy):  # don't be alarmed, thompson policy 
     pass
 
 class OnlineSlopeBanditTeacher(AbstractTeacher):
-    def __init__(self, policy=BoltzmannPolicy(), n_actions=1, lr=0.1, absolute=False):
+    def __init__(self, policy=BoltzmannPolicy(), n_actions=1, lr=0.1, absolute=ABSOLUTE):
         super().__init__(n_actions)
         self.policy = policy
         self.lr = lr
@@ -202,7 +202,7 @@ class OnlineSlopeBanditTeacher(AbstractTeacher):
 
 
 class SamplingTeacher(AbstractTeacher):
-    def __init__(self, policy=ThompsonPolicy(), n_actions=1, window_size=10, absolute=False):
+    def __init__(self, policy=ThompsonPolicy(), n_actions=1, window_size=10, absolute=ABSOLUTE):
         super().__init__(n_actions)
         self.policy = policy
         self.window_size = window_size

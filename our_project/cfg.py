@@ -50,6 +50,7 @@ BATCH_SIZE = config["BATCH_SIZE"]
 EPOCHS = config["EPOCHS"]
 NUM_CHARS = config["NUM_CHARS"]
 LR = config["LR"]
+ABSOLUTE = config.get("absolute", False)
 SUMMARY_WRITER_PATH = config["SUMMARY_WRITER_PATH"]
 SEED = config["SEED"]
 TEACHER_NAME = config["TEACHER_NAME"]
