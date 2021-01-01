@@ -1,3 +1,4 @@
+import argparse
 import json
 import random
 import os
@@ -9,16 +10,29 @@ from torch.utils.tensorboard import SummaryWriter
 
 import teachers
 
+
+def config_parser():
+    # argument parser
+    parser = argparse.ArgumentParser(description="Train on addition.")
+    parser.add_argument("--config-file",
+        type=str, nargs=1, help="config file name")
+    parser.add_argument("--config-folder",
+        default="config", type=str, nargs="?", help="config file folder")
+    args = parser.parse_args()
+    return os.path.join(args.config_folder, args.config_file[0])
+CONFIG_FILE = config_parser()
+
 #####################
 _CURRICULUMS = {  # example curricula for 4 actions
     "direct": teachers.gen_curriculum_direct,
     "baseline": teachers.gen_curriculum_baseline,
+    "incremental": teachers.gen_curriculum_incremental,
     "naive": teachers.gen_curriculum_naive,
     "mixed": teachers.gen_curriculum_mixed,
     "combined": teachers.gen_curriculum_combined,
 }
 
-with open("config.json", "r") as f:
+with open(CONFIG_FILE, "r") as f:
     config = json.load(f)
 
 N_INTERACTIONS = config["N_INTERACTIONS"]
@@ -40,6 +54,7 @@ SUMMARY_WRITER_PATH = config["SUMMARY_WRITER_PATH"]
 SEED = config["SEED"]
 TEACHER_NAME = config["TEACHER_NAME"]
 SAVE_MODEL = config["SAVE_MODEL"]  # to see if we multitask
+SHOW_ADD = config["SHOW_ADD"]
 if os.path.isdir(SUMMARY_WRITER_PATH):
     shutil.rmtree(SUMMARY_WRITER_PATH)
 WRITER = SummaryWriter(SUMMARY_WRITER_PATH)
