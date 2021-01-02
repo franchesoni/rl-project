@@ -3,13 +3,13 @@ import os
 import torch
 from tqdm import trange
 
-from cfg import CONFIG_FILE, CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE,
+from cfg import (CONFIG_FILE, CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE,
     N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SHOW_ADD,
-    ABSOLUTE, SUMMARY_WRITER_PATH
+    ABSOLUTE, SUMMARY_WRITER_PATH)
 from classroom import AdditionClassroom, CharacterTable, AdditionTask
 from students import AdditionStudent, AdditionLSTM
-from teachers import CurriculumTeacher, OnlineSlopeBanditTeacher,
-    SamplingTeacher, RAWUCBTeacher
+from teachers import (CurriculumTeacher, OnlineSlopeBanditTeacher,
+    SamplingTeacher, RAWUCBTeacher)
 
 
 '''Welcome to the main script! The _main_ idea here (pun intended) is to 

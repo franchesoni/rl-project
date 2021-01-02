@@ -3,7 +3,8 @@ import warnings
 import numpy as np
 import torch
 
-from cfg import BATCH_SIZE, EPOCHS, MAX_DIGITS, NUM_CHARS, TRAIN_SIZE, VAL_SIZE, WRITER
+from cfg import (BATCH_SIZE, EPOCHS, MAX_DIGITS, NUM_CHARS, TRAIN_SIZE,
+    VAL_SIZE, WRITER)
 
 
 """This is the longest and ugliest code. Have a look at <AbstractClassroom>
