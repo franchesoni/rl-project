@@ -37,8 +37,9 @@ with open(CONFIG_FILE, "r") as f:
 
 N_INTERACTIONS = config["N_INTERACTIONS"]
 MAX_DIGITS = config["MAX_DIGITS"]
+TEACHER_NAME = config["TEACHER_NAME"]
 CURRICULUM = config["CURRICULUM"]
-if type(CURRICULUM) is str:
+if TEACHER_NAME == "curriculum" and type(CURRICULUM) is str:
     if CURRICULUM in _CURRICULUMS.keys():
         CURRICULUM = _CURRICULUMS[CURRICULUM](MAX_DIGITS)
     else:
@@ -53,7 +54,6 @@ LR = config["LR"]
 ABSOLUTE = config.get("absolute", False)
 SUMMARY_WRITER_PATH = config["SUMMARY_WRITER_PATH"]
 SEED = config["SEED"]
-TEACHER_NAME = config["TEACHER_NAME"]
 SAVE_MODEL = config["SAVE_MODEL"]  # to see if we multitask
 SHOW_ADD = config["SHOW_ADD"]
 if os.path.isdir(SUMMARY_WRITER_PATH):
