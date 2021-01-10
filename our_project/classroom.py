@@ -75,7 +75,7 @@ class AbstractTask:
             "This is an abstract class, you should implement this method"
         )
 
-    def get_observation(self, model):
+    def get_observation(self, model, val_size=VAL_SIZE):
         """Computes the observation given model. This should be reimplemented
         inside Student if it's too inefficient to make a whole new computation."""
         raise NotImplementedError(
@@ -302,10 +302,10 @@ class AdditionTask(AbstractTask):
             torch.log(y_pred).reshape(-1, y_pred.shape[2]), y_true_argmax
         )
 
-    def get_observation(self, model):
+    def get_observation(self, model, val_size=VAL_SIZE):
         """Computes the observation given model. This should be reimplemented
         inside Student if it's too inefficient to make a whole new computation."""
-        val_data = self.generate_data(self.uniform_dist, VAL_SIZE)
+        val_data = self.generate_data(self.uniform_dist, val_size)
         val_X, val_y, val_lens = val_data
         val_X = torch.from_numpy(val_X).float().to(model.device)
         pred = model(val_X).transpose(0, 1)
