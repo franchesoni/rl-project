@@ -24,12 +24,12 @@ class AbstractStudent:
         assert self.model is not None
         assert self.optimizer is not None
 
-        # intialize validation variables and data
-        val_data = task.generate_data(task.val_dist, task.val_size)
-        val_X, val_y, val_lens = val_data
-        val_X = torch.from_numpy(val_X).float().to(self.device)  # in order to correctly run through the network
-        val_y = torch.from_numpy(val_y).float().to(self.device)
-        val_scores = []
+        # # intialize validation variables and data
+        # val_data = task.generate_data(task.val_dist, task.val_size)
+        # val_X, val_y, val_lens = val_data
+        # val_X = torch.from_numpy(val_X).float().to(self.device)  # in order to correctly run through the network
+        # val_y = torch.from_numpy(val_y).float().to(self.device)
+        # val_scores = []
 
         # main training loop
         for n_epoch in range(task.epochs):
@@ -42,24 +42,26 @@ class AbstractStudent:
                 task.loss_fn, train_data, task.batch_size
             )
 
-            # evaluation part
-            self.model.eval()
-            with torch.no_grad():
-                val_pred = self.model(val_X).transpose(0, 1)
-                val_scores.append(
-                    task.val_score_fn(val_pred, val_y, val_lens)
-                )
+            # # evaluation part
+            # self.model.eval()
+            # with torch.no_grad():
+            #     val_pred = self.model(val_X).transpose(0, 1)
+            #     val_scores.append(
+            #         task.val_score_fn(val_pred, val_y, val_lens)
+            #     )
             self.global_step += 1
-            WRITER.add_scalar('Student/Val_epoch_score', val_scores[-1], self.global_step)
+            # WRITER.add_scalar('Student/Val_epoch_score', val_scores[-1], self.global_step)
 
-            observation = task.get_observation(self.model)  # this takes more than half the time
+            observation = task.get_observation(self.model, val_size=1000)  # this takes more than half the time
             WRITER.add_scalars('Student/observations_acc_per_digit', {str(i+1):ob for i, ob in enumerate(observation)}, self.global_step)
 
-            # check if finished
-            if task.finished(val_scores[-1]):
-                break
+            # # check if finished
+            # if task.finished(val_scores[-1]):
+            #     break
 
         # output observation of trained model
+        self.model.eval()
+        observation = task.get_observation(self.model)
         return observation
 
     def _train_epoch(self, loss_fn, train_data, batch_size=1):
