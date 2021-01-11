@@ -59,7 +59,10 @@
 # python3 main.py --config-file raw/config_3_raw.json
 # python3 main.py --config-file raw/config_4_raw.json
 # python3 main.py --config-file raw/config_5_raw.json
-python3 main.py --config-file raw/config_6_raw.json
-python3 main.py --config-file raw/config_7_raw.json
-python3 main.py --config-file raw/config_8_raw.json
-python3 main.py --config-file raw/config_9_raw.json
+# python3 main.py --config-file raw/config_6_raw.json
+# python3 main.py --config-file raw/config_7_raw.json
+# python3 main.py --config-file raw/config_8_raw.json
+# python3 main.py --config-file raw/config_9_raw.json
+
+### [franco]
+python3 main.py --config-file franco/config_1_franco.json

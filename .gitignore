@@ -45,3 +45,4 @@ pydevd*.log
 nodeLanguageServer/**
 nodeLanguageServer.*/**
 **/config.json
+*runs.zip
