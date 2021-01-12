@@ -105,6 +105,7 @@ def show_addition_examples(
                 sol = char_table.decode(y[i])[::-1]
                 print("'{}' = '{}' ('{}')".format(query, pred, sol))
                 WRITER.add_text('examples', "'{}' = '{}' ('{}')\n".format(query, pred, sol))
+                WRITER.add_text('accuracy', str(add_task.accuracy_per_length(y_pred, y, lengths)))
                 i_printed += 1
             i += 1
     else:
@@ -113,8 +114,8 @@ def show_addition_examples(
             pred = char_table.decode(y_pred[i])[::-1]
             sol = char_table.decode(y[i])[::-1]
             print("'{}' = '{}' ('{}')".format(query, pred, sol))
-    print(">>> Accuracy: {}\n".format(
-        add_task.accuracy_per_length(y_pred, y, lengths)))
+            print(">>> Accuracy: {}\n".format(
+                add_task.accuracy_per_length(y_pred, y, lengths)))
     return X, y, lengths, model
 
 if __name__=='__main__':
