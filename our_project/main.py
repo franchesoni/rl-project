@@ -104,8 +104,7 @@ def show_addition_examples(
                 pred = char_table.decode(y_pred[i])[::-1]
                 sol = char_table.decode(y[i])[::-1]
                 print("'{}' = '{}' ('{}')".format(query, pred, sol))
-                with open('config/franco/one_digit_errors.txt', 'a') as f:
-                    f.write("'{}' = '{}' ('{}')\n".format(query, pred, sol))
+                WRITER.add_text('examples', "'{}' = '{}' ('{}')\n".format(query, pred, sol))
                 i_printed += 1
             i += 1
     else:
