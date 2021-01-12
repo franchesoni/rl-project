@@ -175,6 +175,27 @@ class AdditionClassroom(AbstractClassroom):
     def compute_reward(self, obs):
         return self.compute_reward_diff(obs)
 
+
+class AdditionClassroom2(AdditionClassroom):
+    def generate_task(self, task_dist):
+        """Generates a new task according to task_dist. Task dist should be
+        a one hot vector when all work is finished."""
+        val_dist = np.zeros_like(task_dist)  # validation distribution is on final task by default
+        val_dist[-1] = 1  # final task
+        task = AdditionTask2(
+            train_dist=task_dist,
+            train_size=TRAIN_SIZE,
+            val_dist=val_dist,
+            val_size=VAL_SIZE,
+            batch_size=BATCH_SIZE,
+            epochs=EPOCHS,
+            max_digits=MAX_DIGITS,
+        )
+        return task
+
+    def compute_reward(self, obs):
+        return - np.array([obs] * len(MAX_DIGITS))  # multidigit loss
+
 '''This is the task that has _everything_ (except for the NN model, in student,
 and the decision policy, in the teacher, and the reward computation, in the
 classroom)'''
@@ -347,7 +368,13 @@ class AdditionTask2(AdditionTask):
         inside Student if it's too inefficient to make a whole new computation."""
         val_data = self.generate_data(self.uniform_dist, val_size)
         val_X, val_y, val_lens = val_data
-        val_X = torch.from_numpy(val_X).float().to(model.device)
-        pred = model(val_X).transpose(0, 1)
-        return self.accuracy_per_length(pred.cpu().detach().numpy(), val_y, val_lens)
+        model.eval()
+        with torch.no_grad():
+            val_X = torch.from_numpy(val_X).float().to(model.device)
+            y_pred = model(val_X).transpose(0, 1)
+            y_true_argmax = torch.argmax(val_y, dim=-1).view(-1)  # flatten
+            avgloss = torch.nn.NLLLoss()(
+                torch.log(y_pred).reshape(-1, y_pred.shape[2]), y_true_argmax
+            )
+        return avgloss
 

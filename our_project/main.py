@@ -6,8 +6,8 @@ from tqdm import trange
 
 from cfg import (CONFIG_FILE, CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE,
     N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SHOW_ADD,
-    ABSOLUTE, SUMMARY_WRITER_PATH)
-from classroom import AdditionClassroom, CharacterTable, AdditionTask
+    ABSOLUTE, SUMMARY_WRITER_PATH, CLASS_NUMBER)
+from classroom import AdditionClassroom, AdditionClassroom1, CharacterTable, AdditionTask
 from students import AdditionStudent, AdditionLSTM
 from teachers import (CurriculumTeacher, OnlineSlopeBanditTeacher,
     SamplingTeacher, RAWUCBTeacher)
@@ -22,7 +22,7 @@ Seed and writer dest are in classroom.py.'''
 
 def run_specific_teacher_addition(
         teacher_name=TEACHER_NAME, show_addition=SHOW_ADD,
-        show_freq=1, dist_show="direct"):
+        show_freq=10, dist_show="direct"):
     if teacher_name == 'online':
         teacher = OnlineSlopeBanditTeacher(
             n_actions=MAX_DIGITS, absolute=ABSOLUTE)
@@ -36,9 +36,14 @@ def run_specific_teacher_addition(
     elif teacher_name == 'raw':   
         teacher = RAWUCBTeacher(
             n_actions=MAX_DIGITS)
+    else:
+        raise ValueError
 
     student = AdditionStudent()
-    classroom = AdditionClassroom(teacher=teacher, student=student)
+    if CLASS_NUMBER == 1:
+        classroom = AdditionClassroom1(teacher=teacher, student=student)
+    else:
+        classroom = AdditionClassroom(teacher=teacher, student=student)
     pbar = trange(N_INTERACTIONS)
     for i in pbar:
         pbar.set_description("Processing {}".format(CONFIG_FILE))
@@ -78,6 +83,7 @@ def show_addition_examples(
         model_path, max_digits, n_examples=5, nb_print=5, dist="direct", only_wrong=True):
     model = AdditionLSTM(max_digits=max_digits)
     model.load_state_dict(torch.load(model_path))
+    os.remove(model_path)
     model.eval()
     if dist == "direct":
         curriculum = _CURRICULUMS["direct"](max_digits)[0]
@@ -103,7 +109,6 @@ def show_addition_examples(
                 query = char_table.decode(X[i])[::-1]
                 pred = char_table.decode(y_pred[i])[::-1]
                 sol = char_table.decode(y[i])[::-1]
-                print("'{}' = '{}' ('{}')".format(query, pred, sol))
                 WRITER.add_text('examples', "'{}' = '{}' ('{}')\n".format(query, pred, sol))
                 WRITER.add_text('accuracy', str(add_task.accuracy_per_length(y_pred, y, lengths)))
                 i_printed += 1

@@ -1,0 +1,5 @@
+ON 3 digit
+Exp 1
+    raw with original reward (slope)  (copied from franco_2)
+Exp 2
+    raw with smoothed reward (- crossentropy loss) 
