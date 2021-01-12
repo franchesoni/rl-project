@@ -13,4 +13,5 @@
 "TEACHER_NAME": "curriculum", 
 "SAVE_MODEL": true,
 "SHOW_ADD": true,
-"SEED": 42}
+"SEED": 42,
+"OPTIM": "SGD"}

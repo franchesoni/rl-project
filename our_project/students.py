@@ -25,7 +25,7 @@ class AbstractStudent:
         assert self.optimizer is not None
 
         # intialize validation variables and data
-        val_data = task.generate_data(task.val_dist, val_size=1000)  # originally: task.val_size)
+        val_data = task.generate_data(task.val_dist, size=1000)  # originally: task.val_size)
         val_X, val_y, val_lens = val_data
         val_X = torch.from_numpy(val_X).float().to(self.device)  # in order to correctly run through the network
 

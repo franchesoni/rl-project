@@ -210,28 +210,6 @@ class AdditionTask(AbstractTask):
         return np.take_along_axis(a,idx,axis=axis)
 
 
-        # uniform = np.random.rand(size)
-        # cdist = np.cumsum(dist)
-        # n_occurrences = [0]
-        # for i in range(len(cdist)):
-        #     n_occurrences.append(sum(uniform<cdist[i]) - n_occurrences[-1])
-        # n_occurrences = n_occurrences[1:]
-            
-        # X = []
-        # for i, n in enumerate(n_occurrences):
-        #     spaces = np.zeros((n, self.maxlen-2*(i+1)-1, 12))
-        #     spaces[:,:,0] = 1  # put spaces
-        #     pluses = np.zeros((n, 1, 12))
-        #     pluses[:,:,1] = 1
-        #     numbers = np.zeros((n, 2*(i+1), 10))  # 10 digits
-        #     numbers[:, :, 0] = 1  # set some to 1
-        #     numbers = self.shuffle_along_axis(numbers, axis=-1)
-        #     numbers = np.concatenate((np.zeros((n, 2*(i+1), 2)), numbers), axis=2)
-        #     X.append(np.concatenate((spaces, numbers[:,:i+1], pluses, numbers[:,i+1:]), axis=1))
-        # X = np.concatenate(X, axis=0)
-        # np.random.shuffle(X)
-
-
     def generate_data(self, dist, size):
         """Generates onehot encoded batch X of shape (size, maxlen, num_chars)
         and y of shape (size, max_digits+1, num_chars). The order of the one hot
