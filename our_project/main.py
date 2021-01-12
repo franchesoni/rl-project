@@ -7,7 +7,7 @@ from tqdm import trange
 from cfg import (CONFIG_FILE, CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE,
     N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SHOW_ADD,
     ABSOLUTE, SUMMARY_WRITER_PATH, CLASS_NUMBER)
-from classroom import AdditionClassroom, AdditionClassroom1, CharacterTable, AdditionTask
+from classroom import AdditionClassroom, AdditionClassroom2, CharacterTable, AdditionTask
 from students import AdditionStudent, AdditionLSTM
 from teachers import (CurriculumTeacher, OnlineSlopeBanditTeacher,
     SamplingTeacher, RAWUCBTeacher)
@@ -40,8 +40,8 @@ def run_specific_teacher_addition(
         raise ValueError
 
     student = AdditionStudent()
-    if CLASS_NUMBER == 1:
-        classroom = AdditionClassroom1(teacher=teacher, student=student)
+    if CLASS_NUMBER == 2:
+        classroom = AdditionClassroom2(teacher=teacher, student=student)
     else:
         classroom = AdditionClassroom(teacher=teacher, student=student)
     pbar = trange(N_INTERACTIONS)
