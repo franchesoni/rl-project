@@ -9,7 +9,7 @@
 "NUM_CHARS": 12,
 "LR": 16,
 "ABSOLUTE": true,
-"SUMMARY_WRITER_PATH": "./runs/franco/franco_3_sgd",
+"SUMMARY_WRITER_PATH": "./runs/franco_1/direct_sgd",
 "TEACHER_NAME": "curriculum", 
 "SAVE_MODEL": true,
 "SHOW_ADD": false,

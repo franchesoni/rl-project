@@ -224,7 +224,7 @@ class AdditionTask(AbstractTask):
         for i, gen_digits in enumerate(gen_digitss):
             a = "".join(numbers[start_ind:start_ind+gen_digits])
             b = "".join(numbers[start_ind+gen_digits:start_ind+2*gen_digits])
-            # a, b = int(a), int(b)  # as in the paper  # BREAKING CHANGE
+            a, b = int(a), int(b)  # as in the paper  # BREAKING CHANGE
             start_ind += gen_digits*2
             # Pad the data with spaces such that it is always MAXLEN
             query = "{}+{}".format(a, b).ljust(self.maxlen)
