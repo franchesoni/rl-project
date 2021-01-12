@@ -1,0 +1,16 @@
+Exp 1
+
+Run one digit addition to see where the errors lie
+
+Exp 2
+
+Increment learning rate from 0.001 to 0.01 to see if we can surpass 0.9
+
+Exp 3
+
+Use SGD instead of adam (after manually setting LR=16) to get to 0.98 acc
+
+Exp 4
+
+Come back to adam to see if larger learning rate is better. It is not. (1 doesn't work)
+

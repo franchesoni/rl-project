@@ -69,5 +69,8 @@
 # echo -e "config_1\n" >> config/franco/one_digit_errors.txt
 # python3 main.py --config-file franco/config_2_franco.json
 # echo -e "config_2\n" >> config/franco/one_digit_errors.txt
-python3 main.py --config-file franco/config_3_franco.json
+# python3 main.py --config-file franco/config_3_franco.json
+# python3 main.py --config-file franco/config_4_franco.json
+# echo -e "config_5\n" >> config/franco/one_digit_errors.txt
+# python3 main.py --config-file franco/config_5_franco.json
 
