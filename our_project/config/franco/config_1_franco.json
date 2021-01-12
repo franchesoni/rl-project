@@ -9,8 +9,8 @@
 "NUM_CHARS": 12,
 "LR": 0.001,
 "ABSOLUTE": true,
-"SUMMARY_WRITER_PATH": "./runs/direct/1_direct",
+"SUMMARY_WRITER_PATH": "./runs/franco/franco_1",
 "TEACHER_NAME": "curriculum", 
 "SAVE_MODEL": true,
-"SHOW_ADD": false,
+"SHOW_ADD": true,
 "SEED": 42}

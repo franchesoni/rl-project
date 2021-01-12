@@ -65,4 +65,9 @@
 # python3 main.py --config-file raw/config_9_raw.json
 
 ### [franco]
-python3 main.py --config-file franco/config_1_franco.json
+# python3 main.py --config-file franco/config_1_franco.json
+# echo -e "config_1\n" >> config/franco/one_digit_errors.txt
+# python3 main.py --config-file franco/config_2_franco.json
+# echo -e "config_2\n" >> config/franco/one_digit_errors.txt
+python3 main.py --config-file franco/config_3_franco.json
+

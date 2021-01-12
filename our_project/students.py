@@ -1,7 +1,7 @@
 import numpy
 import torch
 
-from cfg import LR, MAX_DIGITS, NUM_CHARS
+from cfg import LR, MAX_DIGITS, NUM_CHARS, OPTIM
 from classroom import WRITER
 
 '''Welcome to the student's site. We have an abstract class of what is a
@@ -115,9 +115,15 @@ class AdditionStudent(AbstractStudent):
         self.model = AdditionLSTM(
             num_chars, hidden_size, MAX_DIGITS
         ).to(self.device)
-        self.optimizer = torch.optim.Adam(
-            self.model.parameters(), lr=LR
-        )  # without clipnorm
+        if OPTIM == 'SGD':
+            self.optimizer = torch.optim.SGD(
+                self.model.parameters(), lr=LR
+            )  # without clipnorm
+        else:
+            self.optimizer = torch.optim.Adam(
+                self.model.parameters(), lr=LR
+            )  # without clipnorm
+
 
 
 class AdditionLSTM(torch.nn.Module):

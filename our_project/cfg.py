@@ -56,6 +56,7 @@ SUMMARY_WRITER_PATH = config["SUMMARY_WRITER_PATH"]
 SEED = config["SEED"]
 SAVE_MODEL = config["SAVE_MODEL"]  # to see if we multitask
 SHOW_ADD = config["SHOW_ADD"]
+OPTIM = config["OPTIM"]
 if os.path.isdir(SUMMARY_WRITER_PATH):
     shutil.rmtree(SUMMARY_WRITER_PATH)
 WRITER = SummaryWriter(SUMMARY_WRITER_PATH)

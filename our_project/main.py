@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 import torch
 from tqdm import trange
 
@@ -21,7 +22,7 @@ Seed and writer dest are in classroom.py.'''
 
 def run_specific_teacher_addition(
         teacher_name=TEACHER_NAME, show_addition=SHOW_ADD,
-        show_freq=10, dist_show="direct"):
+        show_freq=1, dist_show="direct"):
     if teacher_name == 'online':
         teacher = OnlineSlopeBanditTeacher(
             n_actions=MAX_DIGITS, absolute=ABSOLUTE)
@@ -47,7 +48,7 @@ def run_specific_teacher_addition(
                 SUMMARY_WRITER_PATH, "model_{}.pt".format(i))
             torch.save(student.model.state_dict(), model_path)
             show_addition_examples(
-                model_path, MAX_DIGITS, n_examples=100, dist=dist_show)
+                model_path, MAX_DIGITS, n_examples=100, nb_print=10, dist=dist_show)
 
     if SAVE_MODEL:
         torch.save(student.model.state_dict(),
@@ -74,7 +75,7 @@ def profile(function):  # I don't know where to put this
     breakpoint()
 
 def show_addition_examples(
-        model_path, max_digits, n_examples=5, nb_print=5, dist="direct"):
+        model_path, max_digits, n_examples=5, nb_print=5, dist="direct", only_wrong=True):
     model = AdditionLSTM(max_digits=max_digits)
     model.load_state_dict(torch.load(model_path))
     model.eval()
@@ -91,11 +92,28 @@ def show_addition_examples(
     y = torch.from_numpy(y).flip(dims=[1]).detach().numpy()
     y_pred = model(torch.from_numpy(X).float()).detach().numpy().transpose(1,0,2)
     y_pred = torch.from_numpy(y_pred).flip(dims=[1]).detach().numpy()
-    for i in range(min(nb_print, n_examples)):
-        query = char_table.decode(X[i])[::-1]
-        pred = char_table.decode(y_pred[i])[::-1]
-        sol = char_table.decode(y[i])[::-1]
-        print("{} = {} ({})".format(query, pred, sol))
+    if only_wrong:
+        i, i_printed = 0, 0
+        y2 = np.argmax(y, axis=-1)  # target indices  (batch, max_digits+1)
+        p = np.argmax(y_pred, axis=-1)  # inferred indices  (batch, max_digits+1)
+        while (i < n_examples) and (i_printed < nb_print):
+            y3 = y2[i]
+            p3 = p[i]
+            if np.any(y3 != p3):
+                query = char_table.decode(X[i])[::-1]
+                pred = char_table.decode(y_pred[i])[::-1]
+                sol = char_table.decode(y[i])[::-1]
+                print("'{}' = '{}' ('{}')".format(query, pred, sol))
+                with open('config/franco/one_digit_errors.txt', 'a') as f:
+                    f.write("'{}' = '{}' ('{}')\n".format(query, pred, sol))
+                i_printed += 1
+            i += 1
+    else:
+        for i in range(min(nb_print, n_examples)):
+            query = char_table.decode(X[i])[::-1]
+            pred = char_table.decode(y_pred[i])[::-1]
+            sol = char_table.decode(y[i])[::-1]
+            print("'{}' = '{}' ('{}')".format(query, pred, sol))
     print(">>> Accuracy: {}\n".format(
         add_task.accuracy_per_length(y_pred, y, lengths)))
     return X, y, lengths, model
