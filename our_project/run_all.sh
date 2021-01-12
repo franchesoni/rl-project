@@ -64,13 +64,20 @@
 # python3 main.py --config-file raw/config_8_raw.json
 # python3 main.py --config-file raw/config_9_raw.json
 
-### [franco]
-# python3 main.py --config-file franco/config_1_franco.json
-# echo -e "config_1\n" >> config/franco/one_digit_errors.txt
-# python3 main.py --config-file franco/config_2_franco.json
-# echo -e "config_2\n" >> config/franco/one_digit_errors.txt
-# python3 main.py --config-file franco/config_3_franco.json
-# python3 main.py --config-file franco/config_4_franco.json
-# echo -e "config_5\n" >> config/franco/one_digit_errors.txt
-# python3 main.py --config-file franco/config_5_franco.json
+### [franco1]
+# python3 main.py --config-file franco_1/config_1_franco.json
+# echo -e "config_1\n" >> config/franco_1/one_digit_errors.txt
+# python3 main.py --config-file franco_1/config_2_franco.json
+# echo -e "config_2\n" >> config/franco_1/one_digit_errors.txt
+# python3 main.py --config-file franco_1/config_3_franco.json
+# python3 main.py --config-file franco_1/config_4_franco.json
+
+### [franco2]
+# rm -rf runs/franco_2/
+# python3 main.py --config-file franco_2/config_1_franco.json
+# python3 main.py --config-file franco_2/config_2_franco.json
+# python3 main.py --config-file franco_2/config_3_franco.json
+# python3 main.py --config-file franco_2/config_4_franco.json
+# python3 main.py --config-file franco_2/config_5_franco.json
+
 

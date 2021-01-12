@@ -1,0 +1,10 @@
+Exp 1
+    Run 3 digit direct to have a (time) baseline
+Exp 2
+    Run 3 digit uniform to have another baseline
+Exp 3
+    Run 3 digit raw 
+Exp 4
+    Run 3 digit uniform with 1 epoch instead of 10 
+Exp 5
+    Run 3 digit raw with 1 epoch instead of 10 

@@ -246,6 +246,7 @@ class AdditionTask(AbstractTask):
         for i, gen_digits in enumerate(gen_digitss):
             a = "".join(numbers[start_ind:start_ind+gen_digits])
             b = "".join(numbers[start_ind+gen_digits:start_ind+2*gen_digits])
+            # a, b = int(a), int(b)  # as in the paper  # BREAKING CHANGE
             start_ind += gen_digits*2
             # Pad the data with spaces such that it is always MAXLEN
             query = "{}+{}".format(a, b).ljust(self.maxlen)
@@ -312,7 +313,8 @@ class AdditionTask(AbstractTask):
         return self.accuracy_per_length(pred.cpu().detach().numpy(), val_y, val_lens)
 
     def val_score_fn(self, val_pred, val_y, val_lens):
-        return self.full_number_accuracy(val_pred, val_y)
+        return self.accuracy_per_length(val_pred.cpu().detach().numpy(), val_y, val_lens)
+        # return self.full_number_accuracy(val_pred, val_y)
 
     def finished(self, val_score):
         """Returns bool telling if val score is enough to finish. It assumes
@@ -359,4 +361,15 @@ class CharacterTable(object):
     def decode(self, X):
         X = X.argmax(axis=-1)  # gets first index of greatest integer
         return "".join(self.indices_to_char[x] for x in X)
+
+
+class AdditionTask2(AdditionTask):
+    def get_observation(self, model, val_size=VAL_SIZE):
+        """Computes the observation given model. This should be reimplemented
+        inside Student if it's too inefficient to make a whole new computation."""
+        val_data = self.generate_data(self.uniform_dist, val_size)
+        val_X, val_y, val_lens = val_data
+        val_X = torch.from_numpy(val_X).float().to(model.device)
+        pred = model(val_X).transpose(0, 1)
+        return self.accuracy_per_length(pred.cpu().detach().numpy(), val_y, val_lens)
 
