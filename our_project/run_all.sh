@@ -81,10 +81,10 @@ python3 main.py --config-file franco_2/config_3_franco.json
 python3 main.py --config-file franco_2/config_4_franco.json
 python3 main.py --config-file franco_2/config_5_franco.json
 
-### [franco2]
+### [franco3]
 rm -rf runs/franco_3/
-cp -r runs/franco_2/raw_3_1epoch runs/franco_3/raw_3
 python3 main.py --config-file franco_3/config_2_franco.json
+cp -r runs/franco_2/raw_3_1epoch runs/franco_3/raw_3
 
 
 

@@ -7,7 +7,7 @@ from tqdm import trange
 from cfg import (CONFIG_FILE, CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE,
     N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SHOW_ADD,
     ABSOLUTE, SUMMARY_WRITER_PATH, CLASS_NUMBER)
-from classroom import AdditionClassroom, AdditionClassroom2, CharacterTable, AdditionTask
+from classroom import AdditionClassroom, AdditionClassroom2, AdditionClassroom3, CharacterTable, AdditionTask
 from students import AdditionStudent, AdditionLSTM
 from teachers import (CurriculumTeacher, OnlineSlopeBanditTeacher,
     SamplingTeacher, RAWUCBTeacher)
@@ -42,6 +42,8 @@ def run_specific_teacher_addition(
     student = AdditionStudent()
     if CLASS_NUMBER == 2:
         classroom = AdditionClassroom2(teacher=teacher, student=student)
+    if CLASS_NUMBER == 3:
+        classroom = AdditionClassroom3(teacher=teacher, student=student)
     else:
         classroom = AdditionClassroom(teacher=teacher, student=student)
     pbar = trange(N_INTERACTIONS)
@@ -79,8 +81,11 @@ def profile(function):  # I don't know where to put this
     stats.print_stats(20)
     breakpoint()
 
+examples_count = 0
 def show_addition_examples(
         model_path, max_digits, n_examples=5, nb_print=5, dist="direct", only_wrong=True):
+    global examples_count
+    examples_count += 1
     model = AdditionLSTM(max_digits=max_digits)
     model.load_state_dict(torch.load(model_path))
     os.remove(model_path)
@@ -109,8 +114,8 @@ def show_addition_examples(
                 query = char_table.decode(X[i])[::-1]
                 pred = char_table.decode(y_pred[i])[::-1]
                 sol = char_table.decode(y[i])[::-1]
-                WRITER.add_text('examples', "'{}' = '{}' ('{}')\n".format(query, pred, sol))
-                WRITER.add_text('accuracy', str(add_task.accuracy_per_length(y_pred, y, lengths)))
+                WRITER.add_text('examples', "'{}' = '{}' ('{}')\n".format(query, pred, sol), examples_count)
+                WRITER.add_text('accuracy', str(add_task.accuracy_per_length(y_pred, y, lengths)), examples_count)
                 i_printed += 1
             i += 1
     else:

@@ -14,4 +14,4 @@
 "SAVE_MODEL": true,
 "SHOW_ADD": true,
 "SEED": 42,
-"OPTIM": "SGD"}
+"OPTIM": "adam"}

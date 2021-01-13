@@ -1,5 +1,8 @@
-ON 3 digit
+ON 3 digit (trying to make it rotting)
 Exp 1
     raw with original reward (slope)  (copied from franco_2)
 Exp 2
     raw with smoothed reward (- crossentropy loss) 
+Exp 3
+    raw with abs reward  
+

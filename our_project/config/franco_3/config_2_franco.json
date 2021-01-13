@@ -9,7 +9,7 @@
 "NUM_CHARS": 12,
 "LR": 16,
 "ABSOLUTE": true,
-"SUMMARY_WRITER_PATH": "./runs/franco_3/raw_3_classroom1",
+"SUMMARY_WRITER_PATH": "./runs/franco_3/raw_3_classroom2",
 "TEACHER_NAME": "raw", 
 "SAVE_MODEL": true,
 "SHOW_ADD": false,

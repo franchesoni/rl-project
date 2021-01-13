@@ -176,6 +176,10 @@ class AdditionClassroom(AbstractClassroom):
         return self.compute_reward_diff(obs)
 
 
+class AdditionClassroom3(AdditionClassroom):
+    def compute_reward(self, obs):
+        return np.abs(self.compute_reward_diff(obs))
+
 class AdditionClassroom2(AdditionClassroom):
     def generate_task(self, task_dist):
         """Generates a new task according to task_dist. Task dist should be
