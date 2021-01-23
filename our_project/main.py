@@ -41,12 +41,15 @@ def run_specific_teacher_addition(
         raise ValueError
 
     student = AdditionStudent()
-    if CLASS_NUMBER == 2:
+    if CLASS_NUMBER == 1:
+        classroom = AdditionClassroom(teacher=teacher, student=student)
+    elif CLASS_NUMBER == 2:
         classroom = AdditionClassroom2(teacher=teacher, student=student)
-    if CLASS_NUMBER == 3:
+    elif CLASS_NUMBER == 3:
         classroom = AdditionClassroom3(teacher=teacher, student=student)
     else:
-        classroom = AdditionClassroom(teacher=teacher, student=student)
+        raise ValueError("CLASS_NUMBER {} is not a valid classroom number.".format(CLASS_NUMBER))
+    
     pbar = trange(N_INTERACTIONS)
     for i in pbar:
         pbar.set_description("Processing {}".format(CONFIG_FILE))
