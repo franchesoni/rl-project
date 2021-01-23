@@ -11,6 +11,7 @@
 "ABSOLUTE": true,
 "SUMMARY_WRITER_PATH": "./runs/new/online_1",
 "TEACHER_NAME": "online", 
+"BOLTZMANN_TEMPERATURE": 0.05,
 "SAVE_MODEL": true,
 "SHOW_ADD": true,
 "SEED": 0}
