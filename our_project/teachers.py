@@ -186,8 +186,10 @@ class ThompsonPolicy(EpsilonGreedyPolicy):  # don't be alarmed, thompson policy 
     pass
 
 class OnlineSlopeBanditTeacher(AbstractTeacher):
-    def __init__(self, policy=BoltzmannPolicy(), n_actions=1, lr=0.1, absolute=False):
+    def __init__(self, policy=None, n_actions=1, lr=0.1, absolute=False, temperature=1.0):
         super().__init__(n_actions)
+        if policy is None:
+            policy = BoltzmannPolicy(temperature)
         self.policy = policy
         self.lr = lr
         self.absolute = absolute

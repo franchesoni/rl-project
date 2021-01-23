@@ -38,6 +38,7 @@ with open(CONFIG_FILE, "r") as f:
 N_INTERACTIONS = config["N_INTERACTIONS"]
 MAX_DIGITS = config["MAX_DIGITS"]
 TEACHER_NAME = config["TEACHER_NAME"]
+BOLTZMANN_TEMPERATURE = config.get("BOLTZMANN_TEMPERATURE", 1.0)
 CURRICULUM = config["CURRICULUM"]
 if TEACHER_NAME == "curriculum" and type(CURRICULUM) is str:
     if CURRICULUM in _CURRICULUMS.keys():
