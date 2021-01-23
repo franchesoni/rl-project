@@ -9,11 +9,11 @@
 "NUM_CHARS": 12,
 "LR": 0.001,
 "ABSOLUTE": true,
-"SUMMARY_WRITER_PATH": "./runs/new/online_1",
+"SUMMARY_WRITER_PATH": "./runs/new/online_2",
 "TEACHER_NAME": "online", 
 "BOLTZMANN_TEMPERATURE": 0.05,
 "SAVE_MODEL": true,
 "SHOW_ADD": true,
 "SEED": 0,
 "OPTIM": "Adam",
-"CLASS_NUMBER": 1}
+"CLASS_NUMBER": 3}
