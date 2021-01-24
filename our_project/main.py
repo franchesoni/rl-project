@@ -6,7 +6,8 @@ from tqdm import trange
 
 from cfg import (CONFIG_FILE, CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE,
     N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SHOW_ADD,
-    ABSOLUTE, SUMMARY_WRITER_PATH, CLASS_NUMBER, BOLTZMANN_TEMPERATURE)
+    ABSOLUTE, SUMMARY_WRITER_PATH, CLASS_NUMBER, BOLTZMANN_TEMPERATURE,
+    TEACHER_LR)
 from classroom import AdditionClassroom, AdditionClassroom2, AdditionClassroom3, CharacterTable, AdditionTask
 from students import AdditionStudent, AdditionLSTM
 from teachers import (CurriculumTeacher, OnlineSlopeBanditTeacher,
@@ -26,7 +27,7 @@ def run_specific_teacher_addition(
     if teacher_name == 'online':
         teacher = OnlineSlopeBanditTeacher(
             n_actions=MAX_DIGITS, absolute=ABSOLUTE,
-            temperature=BOLTZMANN_TEMPERATURE)
+            temperature=BOLTZMANN_TEMPERATURE, lr=TEACHER_LR)
     elif teacher_name == 'curriculum':
         teacher = CurriculumTeacher(
             curriculum=CURRICULUM, curriculum_schedule=CURRICULUM_SCHEDULE,
