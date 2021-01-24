@@ -1,7 +1,7 @@
 import numpy
 import torch
 
-from cfg import LR, MAX_DIGITS, NUM_CHARS, OPTIM
+from cfg import LR, MAX_DIGITS, NUM_CHARS, OPTIM, seed_everything, SEED
 from classroom import WRITER
 
 '''Welcome to the student's site. We have an abstract class of what is a
@@ -107,10 +107,12 @@ class AbstractStudent:
 at task'''
 
 class AdditionStudent(AbstractStudent):
-    def __init__(self, hidden_size=128):
+    def __init__(self, hidden_size=128, seed=SEED):
         super().__init__()
         num_chars = 12  # We know this
         assert num_chars == NUM_CHARS
+        if seed is not None:
+            seed_everything(seed)
         self.model = AdditionLSTM(
             num_chars, hidden_size, MAX_DIGITS
         ).to(self.device)
