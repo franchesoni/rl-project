@@ -9,11 +9,11 @@
 "NUM_CHARS": 12,
 "LR": 0.001,
 "ABSOLUTE": true,
-"SUMMARY_WRITER_PATH": "./runs/new/test",
+"SUMMARY_WRITER_PATH": "./runs/new/test_direct",
 "TEACHER_NAME": "curriculum", 
 "BOLTZMANN_TEMPERATURE": 0.05,
 "SAVE_MODEL": true,
-"SHOW_ADD": true,
+"SHOW_ADD": false,
 "SEED": 0,
 "OPTIM": "Adam",
 "CLASS_NUMBER": 1}
