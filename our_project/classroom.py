@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from cfg import (BATCH_SIZE, EPOCHS, MAX_DIGITS, NUM_CHARS, TRAIN_SIZE,
-    VAL_SIZE, WRITER)
+    VAL_SIZE, OBS_SIZE, WRITER)
 
 
 """This is the longest and ugliest code. Have a look at <AbstractClassroom>
@@ -54,12 +54,13 @@ is to set tasks as being a set of handcrafted curricula."""
 
 class AbstractTask:
     def __init__(
-        self, train_dist, train_size, val_dist, val_size, batch_size=4096, epochs=1,
+        self, train_dist, train_size, val_dist, val_size, obs_size, batch_size=4096, epochs=1,
     ):
         self.train_dist = train_dist
         self.train_size = train_size
         self.val_dist = val_dist
         self.val_size = val_size
+        self.obs_size = obs_size
         self.batch_size = batch_size
         self.epochs = epochs
 
@@ -75,7 +76,7 @@ class AbstractTask:
             "This is an abstract class, you should implement this method"
         )
 
-    def get_observation(self, model, val_size=VAL_SIZE):
+    def get_observation(self, model, size=OBS_SIZE):
         """Computes the observation given model. This should be reimplemented
         inside Student if it's too inefficient to make a whole new computation."""
         raise NotImplementedError(
@@ -160,6 +161,7 @@ class AdditionClassroom(AbstractClassroom):
             train_size=TRAIN_SIZE,
             val_dist=val_dist,
             val_size=VAL_SIZE,
+            obs_size=OBS_SIZE,
             batch_size=BATCH_SIZE,
             epochs=EPOCHS,
             max_digits=MAX_DIGITS,
@@ -191,6 +193,7 @@ class AdditionClassroom2(AdditionClassroom):
             train_size=TRAIN_SIZE,
             val_dist=val_dist,
             val_size=VAL_SIZE,
+            obs_size=OBS_SIZE,
             batch_size=BATCH_SIZE,
             epochs=EPOCHS,
             max_digits=MAX_DIGITS,
@@ -211,13 +214,14 @@ class AdditionTask(AbstractTask):
         train_size,
         val_dist,
         val_size,
+        obs_size,
         batch_size=4096,
         epochs=1,
         max_digits=15,
         invert=True,
     ):
         super().__init__(
-            train_dist, train_size, val_dist, val_size, batch_size, epochs,
+            train_dist, train_size, val_dist, val_size, obs_size, batch_size, epochs,
         )
         self.val_dist = val_dist
         self.uniform_dist = np.ones_like(val_dist) / len(val_dist)
@@ -306,14 +310,14 @@ class AdditionTask(AbstractTask):
             torch.log(y_pred).reshape(-1, y_pred.shape[2]), y_true_argmax
         )
 
-    def get_observation(self, model, val_size=VAL_SIZE):
+    def get_observation(self, model, size=OBS_SIZE):
         """Computes the observation given model. This should be reimplemented
         inside Student if it's too inefficient to make a whole new computation."""
-        val_data = self.generate_data(self.uniform_dist, val_size)
-        val_X, val_y, val_lens = val_data
-        val_X = torch.from_numpy(val_X).float().to(model.device)
-        pred = model(val_X).transpose(0, 1)
-        return self.accuracy_per_length(pred.cpu().detach().numpy(), val_y, val_lens)
+        obs_data = self.generate_data(self.uniform_dist, size)
+        obs_X, obs_y, obs_lens = obs_data
+        obs_X = torch.from_numpy(obs_X).float().to(model.device)
+        pred = model(obs_X).transpose(0, 1)
+        return self.accuracy_per_length(pred.cpu().detach().numpy(), obs_y, obs_lens)
 
     def val_score_fn(self, val_pred, val_y, val_lens):
         return self.accuracy_per_length(val_pred.cpu().detach().numpy(), val_y, val_lens)
@@ -367,16 +371,16 @@ class CharacterTable(object):
 
 
 class AdditionTask2(AdditionTask):
-    def get_observation(self, model, val_size=VAL_SIZE):
+    def get_observation(self, model, size=OBS_SIZE):
         """Computes the observation given model. This should be reimplemented
         inside Student if it's too inefficient to make a whole new computation."""
-        val_data = self.generate_data(self.uniform_dist, val_size)
-        val_X, val_y, val_lens = val_data
+        obs_data = self.generate_data(self.uniform_dist, size)
+        obs_X, obs_y, obs_lens = obs_data
         model.eval()
         with torch.no_grad():
-            val_X = torch.from_numpy(val_X).float().to(model.device)
-            y_pred = model(val_X).transpose(0, 1)
-            y_true_argmax = torch.argmax(val_y, dim=-1).view(-1)  # flatten
+            obs_X = torch.from_numpy(obs_X).float().to(model.device)
+            y_pred = model(obs_X).transpose(0, 1)
+            y_true_argmax = torch.argmax(obs_y, dim=-1).view(-1)  # flatten
             avgloss = torch.nn.NLLLoss()(
                 torch.log(y_pred).reshape(-1, y_pred.shape[2]), y_true_argmax
             )

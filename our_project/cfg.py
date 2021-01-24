@@ -49,6 +49,7 @@ if TEACHER_NAME == "curriculum" and type(CURRICULUM) is str:
 CURRICULUM_SCHEDULE = config["CURRICULUM_SCHEDULE"]
 TRAIN_SIZE = config["TRAIN_SIZE"]
 VAL_SIZE = config["VAL_SIZE"]
+OBS_SIZE = config.get("OBS_SIZE", 1000)
 BATCH_SIZE = config["BATCH_SIZE"]
 EPOCHS = config["EPOCHS"]
 NUM_CHARS = config["NUM_CHARS"]
