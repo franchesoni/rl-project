@@ -25,7 +25,9 @@ class AbstractStudent:
         assert self.optimizer is not None
 
         # intialize validation variables and data
-        val_data = task.generate_data(task.val_dist, size=1000)  # originally: task.val_size)
+        # val_data = task.generate_data(task.val_dist, size=1000)  # originally: task.val_size)
+
+        val_data = task.generate_data(task.train_dist, size=task.val_size)  # originally: task.val_size)
         val_X, val_y, val_lens = val_data
         val_X = torch.from_numpy(val_X).float().to(self.device)  # in order to correctly run through the network
 
@@ -85,7 +87,10 @@ class AbstractStudent:
 
             # update weights
             self.optimizer.zero_grad()
-            pred = self.model(X).transpose(0, 1)
+            pred = self.model(X)
+            if len(pred.shape) == 2:
+                pred = pred.unsqueeze(1)
+            pred = pred.transpose(0, 1)
             loss = loss_fn(pred, y, lens)
             loss.backward()
             # gradient clipping
