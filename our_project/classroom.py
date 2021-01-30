@@ -178,10 +178,6 @@ class AdditionClassroom(AbstractClassroom):
         return self.compute_reward_diff(obs)
 
 
-class AdditionClassroom3(AdditionClassroom):
-    def compute_reward(self, obs):
-        return np.abs(self.compute_reward_diff(obs))
-
 class AdditionClassroom2(AdditionClassroom):
     def generate_task(self, task_dist):
         """Generates a new task according to task_dist. Task dist should be
@@ -201,7 +197,13 @@ class AdditionClassroom2(AdditionClassroom):
         return task
 
     def compute_reward(self, obs):
-        return - np.array([obs] * len(MAX_DIGITS))  # multidigit loss
+        # return - np.array([obs] * len(MAX_DIGITS))  # multidigit loss
+        return obs
+
+class AdditionClassroom3(AdditionClassroom):
+    def compute_reward(self, obs):
+        return np.abs(self.compute_reward_diff(obs))
+
 
 '''This is the task that has _everything_ (except for the NN model, in student,
 and the decision policy, in the teacher, and the reward computation, in the
@@ -372,17 +374,20 @@ class CharacterTable(object):
 
 class AdditionTask2(AdditionTask):
     def get_observation(self, model, size=OBS_SIZE):
-        """Computes the observation given model. This should be reimplemented
-        inside Student if it's too inefficient to make a whole new computation."""
         obs_data = self.generate_data(self.uniform_dist, size)
         obs_X, obs_y, obs_lens = obs_data
         model.eval()
         with torch.no_grad():
             obs_X = torch.from_numpy(obs_X).float().to(model.device)
             y_pred = model(obs_X).transpose(0, 1)
-            y_true_argmax = torch.argmax(obs_y, dim=-1).view(-1)  # flatten
-            avgloss = torch.nn.NLLLoss()(
-                torch.log(y_pred).reshape(-1, y_pred.shape[2]), y_true_argmax
-            )
-        return avgloss
-
+            y_true_argmax = torch.from_numpy(np.argmax(obs_y, axis=-1)).to(model.device)
+            obs_loss = np.zeros(self.max_digits)
+            for i in range(self.max_digits):
+                y_pred_digit = y_pred[obs_lens==i+1]
+                y_true_digit = y_true_argmax[obs_lens==i+1]
+                loss = torch.nn.NLLLoss()(
+                    torch.log(y_pred_digit).transpose(1,2),
+                    y_true_digit
+                )
+                obs_loss[i] = loss
+        return obs_loss
