@@ -197,6 +197,8 @@ class OnlineSlopeBanditTeacher(AbstractTeacher):
 
     def give_task(self, last_rewards):
         if last_rewards is not None:
+            if np.isnan(last_rewards).any():
+                np.nan_to_num(last_rewards, copy=False, nan=0.0)
             self.Q = self.Q + self.lr * (last_rewards - self.Q)
         return self.policy(np.abs(self.Q) if self.absolute else self.Q)
     
