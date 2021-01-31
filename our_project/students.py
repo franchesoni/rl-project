@@ -1,7 +1,7 @@
 import numpy
 import torch
 
-from cfg import LR, MAX_DIGITS, NUM_CHARS, OPTIM, seed_everything, SEED
+from cfg import LR, MAX_DIGITS, NUM_CHARS, OPTIM, seed_everything, SEED, DEVICE
 from classroom import WRITER
 
 '''Welcome to the student's site. We have an abstract class of what is a
@@ -12,7 +12,7 @@ heavily on the given task.'''
 
 class AbstractStudent:
     def __init__(self):
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = DEVICE
         self.model = None
         self.optimizer = None
         self.global_step = 0
@@ -143,7 +143,7 @@ class AdditionLSTM(torch.nn.Module):
         + Softmax
         """
         super().__init__()
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = DEVICE
         self.max_digits = max_digits
         self.lstm_encode = torch.nn.LSTM(
             input_size=onehot_features,
