@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from cfg import (BATCH_SIZE, EPOCHS, MAX_DIGITS, NUM_CHARS, TRAIN_SIZE,
-    VAL_SIZE, OBS_SIZE, WRITER)
+    VAL_SIZE, OBS_SIZE, WRITER, REWARD_FN)
 
 
 """This is the longest and ugliest code. Have a look at <AbstractClassroom>
@@ -179,6 +179,20 @@ class AdditionClassroom(AbstractClassroom):
 
 
 class AdditionClassroom2(AdditionClassroom):
+    def __init__(self, teacher, student, reward_fn=REWARD_FN):
+        super().__init__(teacher, student)
+        self.past_obs = None
+        if reward_fn == "absolute":
+            self.reward_fn = np.abs
+        elif reward_fn == "square":
+            self.reward_fn = np.square
+        elif reward_fn == "neg identity":
+            self.reward_fn = lambda x: -x
+        elif reward_fn == "square root":
+            self.reward_fn = lambda x: np.sqrt(np.abs(x))
+        else:
+            raise ValueError("reward_fn: {} not valid".format(reward_fn))
+
     def generate_task(self, task_dist):
         """Generates a new task according to task_dist. Task dist should be
         a one hot vector when all work is finished."""
@@ -196,9 +210,15 @@ class AdditionClassroom2(AdditionClassroom):
         )
         return task
 
+    def compute_obs_diff(self, obs):
+        if self.past_obs is None:
+            self.past_obs = [obs]
+        self.past_obs.append(obs)
+        return (self.past_obs[-1] - self.past_obs[-2])/self.past_obs[-2]
+
     def compute_reward(self, obs):
-        # return - np.array([obs] * len(MAX_DIGITS))  # multidigit loss
-        return obs
+        return self.reward_fn(self.compute_obs_diff(obs))
+
 
 class AdditionClassroom3(AdditionClassroom):
     def compute_reward(self, obs):
@@ -332,6 +352,24 @@ class AdditionTask(AbstractTask):
         return val_score > 0.99
 
 
+class AdditionTask2(AdditionTask):
+    def get_observation(self, model, size=OBS_SIZE):
+        obs_data = self.generate_data(self.uniform_dist, size)
+        obs_X, obs_y, obs_lens = obs_data
+        model.eval()
+        with torch.no_grad():
+            obs_X = torch.from_numpy(obs_X).float().to(model.device)
+            y_pred = model(obs_X).transpose(0, 1)
+            y_true_argmax = torch.from_numpy(np.argmax(obs_y, axis=-1)).to(model.device)
+            obs_loss = np.array([
+                torch.nn.NLLLoss()(
+                    torch.log(y_pred[obs_lens==i+1]).transpose(1,2),
+                    y_true_argmax[obs_lens==i+1]).item()
+                    for i in range(self.max_digits)
+            ])
+        return obs_loss
+
+
 
 class CharacterTable(object):
     """
@@ -371,23 +409,3 @@ class CharacterTable(object):
         X = X.argmax(axis=-1)  # gets first index of greatest integer
         return "".join(self.indices_to_char[x] for x in X)
 
-
-class AdditionTask2(AdditionTask):
-    def get_observation(self, model, size=OBS_SIZE):
-        obs_data = self.generate_data(self.uniform_dist, size)
-        obs_X, obs_y, obs_lens = obs_data
-        model.eval()
-        with torch.no_grad():
-            obs_X = torch.from_numpy(obs_X).float().to(model.device)
-            y_pred = model(obs_X).transpose(0, 1)
-            y_true_argmax = torch.from_numpy(np.argmax(obs_y, axis=-1)).to(model.device)
-            obs_loss = np.zeros(self.max_digits)
-            for i in range(self.max_digits):
-                y_pred_digit = y_pred[obs_lens==i+1]
-                y_true_digit = y_true_argmax[obs_lens==i+1]
-                loss = torch.nn.NLLLoss()(
-                    torch.log(y_pred_digit).transpose(1,2),
-                    y_true_digit
-                )
-                obs_loss[i] = loss
-        return obs_loss
