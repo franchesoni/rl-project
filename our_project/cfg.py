@@ -64,6 +64,10 @@ CLASS_NUMBER = config.get("CLASS_NUMBER", None)
 if os.path.isdir(SUMMARY_WRITER_PATH):
     shutil.rmtree(SUMMARY_WRITER_PATH)
 WRITER = SummaryWriter(SUMMARY_WRITER_PATH)
+REWARD_FN = config.get("REWARD_FN", "abs")
+DEVICE = config.get("DEVICE", "cuda")
+if DEVICE !=  "cuda" or not torch.cuda.is_available():
+    DEVICE = "cpu"
 
 with open(os.path.join(SUMMARY_WRITER_PATH, "config.json"), "w") as f:
     json.dump(config, f)
