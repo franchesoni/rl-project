@@ -1,4 +1,4 @@
-{"N_INTERACTIONS": 100,
+{"N_INTERACTIONS": 1000,
 "CURRICULUM": "direct",
 "CURRICULUM_SCHEDULE": [],
 "MAX_DIGITS": 4,
@@ -18,5 +18,6 @@
 "SHOW_ADD": false,
 "SEED": 0,
 "OPTIM": "Adam",
-"CLASS_NUMBER": 1,
+"CLASS_NUMBER": 2,
+"REWARD_FN": "neg identity",
 "COMMENT": "Baseline for batch = 1, maybe we should change LR"}

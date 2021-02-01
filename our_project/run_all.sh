@@ -1,15 +1,15 @@
 ### experimental
-rm -rf runs/trash/
-# python3 main.py --config-file trash2/test_direct.json
-# echo "finished"
-# python3 main.py --config-file trash2/test_online.json
-# echo "finished"
-# python3 main.py --config-file trash2/test_onlinebatch1.json
-# echo "finished"
+rm -rf runs/trash2/
+python3 main.py --config-file trash2/test_direct.json
+echo "finished"
+python3 main.py --config-file trash2/test_online.json
+echo "finished"
+python3 main.py --config-file trash2/test_onlinebatch1.json
+echo "finished"
 python3 main.py --config-file trash2/test_rawucb.json
 echo "finished"
-# python3 main.py --config-file trash2/test_onlinebandit.json
-# echo "finished"
+python3 main.py --config-file trash2/test_onlinebandit.json
+echo "finished"
 
 ### [direct] ###
 # python3 main.py --config-file direct/config_1_direct.json
