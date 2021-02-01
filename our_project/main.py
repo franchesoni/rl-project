@@ -4,12 +4,12 @@ import numpy as np
 import torch
 from tqdm import trange
 
-from cfg import (CONFIG_FILE, CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE,
+from cfg import (CONFIG_FILE, CURRICULUM, MODE, _CURRICULUMS, CURRICULUM_SCHEDULE,
     N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SHOW_ADD,
-    ABSOLUTE, SUMMARY_WRITER_PATH, CLASS_NUMBER, BOLTZMANN_TEMPERATURE,
+    ABSOLUTE, SUMMARY_WRITER_PATH, BOLTZMANN_TEMPERATURE,
     TEACHER_LR)
-from classroom import AdditionClassroom, AdditionClassroom_AbsoluteDiff, AdditionClassroom_PG, AdditionClassroom_RelativeRewards, CharacterTable, AdditionTask
-from students import AdditionStudent, AdditionLSTM, AdditionStudent_PG
+from classroom import AdditionClassroom,  CharacterTable, AdditionTask
+from students import AdditionBanditStudent, AdditionStudent, AdditionLSTM 
 from teachers import (CurriculumTeacher, OnlineBanditTeacher, OnlineSlopeSequentialTeacher,
     SamplingTeacher, RAWUCBTeacher)
 
@@ -45,19 +45,13 @@ def run_specific_teacher_addition(
     else:
         raise ValueError
 
-    student = AdditionStudent()
-    if CLASS_NUMBER == 1:  # obs difference, accuracy per length as obs
-        classroom = AdditionClassroom(teacher=teacher, student=student)
-    elif CLASS_NUMBER == 2:
-        classroom = AdditionClassroom_RelativeRewards(teacher=teacher, student=student)
-    elif CLASS_NUMBER == 3:  # abs(obs difference), accuracy per length as obs
-        classroom = AdditionClassroom_AbsoluteDiff(teacher=teacher, student=student)
-    elif CLASS_NUMBER == 4: 
-        student = AdditionStudent_PG()
-        classroom = AdditionClassroom_PG(teacher=teacher, student=student)
-
+    if MODE == 'sequential':
+        student = AdditionStudent()
+    elif MODE == 'bandit':
+        student = AdditionBanditStudent()
     else:
-        raise ValueError("CLASS_NUMBER {} is not a valid classroom number.".format(CLASS_NUMBER))
+        raise ValueError("MODE is not in ['sequential', 'bandit']")
+    classroom = AdditionClassroom(teacher=teacher, student=student)
     
     pbar = trange(N_INTERACTIONS)
     for i in pbar:
