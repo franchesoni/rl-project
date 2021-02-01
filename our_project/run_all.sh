@@ -1,3 +1,16 @@
+### experimental
+rm -rf runs/trash/
+# python3 main.py --config-file trash2/test_direct.json
+# echo "finished"
+# python3 main.py --config-file trash2/test_online.json
+# echo "finished"
+# python3 main.py --config-file trash2/test_onlinebatch1.json
+# echo "finished"
+python3 main.py --config-file trash2/test_rawucb.json
+echo "finished"
+# python3 main.py --config-file trash2/test_onlinebandit.json
+# echo "finished"
+
 ### [direct] ###
 # python3 main.py --config-file direct/config_1_direct.json
 # python3 main.py --config-file direct/config_2_direct.json
@@ -65,26 +78,26 @@
 # python3 main.py --config-file raw/config_9_raw.json
 
 ### [franco1]
-rm -rf runs/franco_1/
-python3 main.py --config-file franco_1/config_1_franco.json
-echo -e "config_1\n" >> config/franco_1/one_digit_errors1.txt
-python3 main.py --config-file franco_1/config_2_franco.json
-echo -e "config_2\n" >> config/franco_1/one_digit_errors2.txt
-python3 main.py --config-file franco_1/config_3_franco.json
-python3 main.py --config-file franco_1/config_4_franco.json
+# rm -rf runs/franco_1/
+# python3 main.py --config-file franco_1/config_1_franco.json
+# echo -e "config_1\n" >> config/franco_1/one_digit_errors1.txt
+# python3 main.py --config-file franco_1/config_2_franco.json
+# echo -e "config_2\n" >> config/franco_1/one_digit_errors2.txt
+# python3 main.py --config-file franco_1/config_3_franco.json
+# python3 main.py --config-file franco_1/config_4_franco.json
 
 ### [franco2]
-rm -rf runs/franco_2/
-python3 main.py --config-file franco_2/config_1_franco.json
-python3 main.py --config-file franco_2/config_2_franco.json
-python3 main.py --config-file franco_2/config_3_franco.json
-python3 main.py --config-file franco_2/config_4_franco.json
-python3 main.py --config-file franco_2/config_5_franco.json
+# rm -rf runs/franco_2/
+# python3 main.py --config-file franco_2/config_1_franco.json
+# python3 main.py --config-file franco_2/config_2_franco.json
+# python3 main.py --config-file franco_2/config_3_franco.json
+# python3 main.py --config-file franco_2/config_4_franco.json
+# python3 main.py --config-file franco_2/config_5_franco.json
 
 ### [franco3]
-rm -rf runs/franco_3/
-python3 main.py --config-file franco_3/config_2_franco.json
-cp -r runs/franco_2/raw_3_1epoch runs/franco_3/raw_3
+# rm -rf runs/franco_3/
+# python3 main.py --config-file franco_3/config_2_franco.json
+# cp -r runs/franco_2/raw_3_1epoch runs/franco_3/raw_3
 
 
 

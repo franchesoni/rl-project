@@ -25,9 +25,10 @@ class AbstractStudent:
         assert self.optimizer is not None
 
         # intialize validation variables and data
-        val_data = task.generate_data(task.uniform_dist, size=task.val_size)  # originally: task.val_size)
-        val_X, val_y, val_lens = val_data
-        val_X = torch.from_numpy(val_X).float().to(self.device)  # in order to correctly run through the network
+        if task.val_size > 0:
+            val_data = task.generate_data(task.uniform_dist, size=task.val_size)  # originally: task.val_size)
+            val_X, val_y, val_lens = val_data
+            val_X = torch.from_numpy(val_X).float().to(self.device)  # in order to correctly run through the network
 
         # main training loop
         for n_epoch in range(task.epochs):
@@ -36,18 +37,18 @@ class AbstractStudent:
             train_data = task.generate_data(  # generate training data
                 task.train_dist, task.train_size
             )
-            self._train_epoch(  # train over all the data one time
+            task.last_loss = self._train_epoch(  # train over all the data one time
                 task.loss_fn, train_data, task.batch_size
             )
 
-            # evaluation part
-            self.model.eval()
-            with torch.no_grad():
-                val_pred = self.model(val_X).transpose(0, 1)
-                val_score = task.val_score_fn(val_pred, val_y, val_lens)
-
             self.global_step += 1
-            WRITER.add_scalars('Student/Val_epoch_score_accperdigit', {str(i+1):ob for i, ob in enumerate(val_score)}, self.global_step)
+            if task.val_size > 0:
+                # evaluation part
+                self.model.eval()
+                with torch.no_grad():
+                    val_pred = self.model(val_X).transpose(0, 1)
+                    val_score = task.val_score_fn(val_pred, val_y, val_lens)
+                WRITER.add_scalars('Student/Val_epoch_score_accperdigit', {str(i+1):ob for i, ob in enumerate(val_score)}, self.global_step)
 
             # # check if finished
             # if task.finished(val_score):
@@ -97,8 +98,10 @@ class AbstractStudent:
 
             self.train_batch_step += 1
             WRITER.add_scalar('Student/Train_batch_loss', loss.detach().item(), self.train_batch_step)
+
         self.train_epoch_step += 1
         WRITER.add_scalar('Student/Train_epoch_loss', loss.detach().item(), self.train_epoch_step)
+        return loss.detach()
 
 
 '''Particular students train different models. But the problem is formulated
@@ -122,6 +125,81 @@ class AdditionStudent(AbstractStudent):
             self.optimizer = torch.optim.Adam(
                 self.model.parameters(), lr=LR
             )  # without clipnorm
+
+
+
+class AdditionStudent_PG(AdditionStudent):
+    def learn_from_task(self, task):
+        # check that it was correctly initialized
+        assert self.model is not None
+        assert self.optimizer is not None
+        assert task.reward_name == 'PG'  # only to be used with prediction gain
+        assert task.epochs == task.train_size == task.batch_size == 1  # epochs and batch size is redundant
+
+        # training part
+        self.model.train()  # set mode 
+        train_data = task.generate_data(  # generate training data
+            task.train_dist, task.train_size
+        )
+
+        train_X, train_y, train_lens = train_data
+        X = (
+            torch.from_numpy(
+                train_X
+            )
+            .float()
+            .to(self.device)
+        )
+        y = (
+            torch.from_numpy(
+                train_y
+            )
+            .float()
+            .to(self.device)
+        )
+        lens = train_lens
+
+        # update weights
+        self.optimizer.zero_grad()
+        pred = self.model(X)
+        if len(pred.shape) == 2:
+            pred = pred.unsqueeze(1)
+        pred = pred.transpose(0, 1)
+        loss = task.loss_fn(pred, y, lens)
+        loss.backward()
+        # gradient clipping
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 0.1)
+        self.optimizer.step()
+
+        self.train_epoch_step += 1
+        self.global_step += 1
+        WRITER.add_scalar('Student/Train_epoch_loss', loss.detach().item(), self.train_epoch_step)
+
+        # output observation of trained model
+        observation = task.get_observation(self.model, loss.detach(), X, y, lens)
+        return observation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

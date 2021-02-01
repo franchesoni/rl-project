@@ -185,7 +185,7 @@ class BoltzmannPolicy:
 class ThompsonPolicy(EpsilonGreedyPolicy):  # don't be alarmed, thompson policy is implemented inside sampling
     pass
 
-class OnlineSlopeBanditTeacher(AbstractTeacher):
+class OnlineSlopeSequentialTeacher(AbstractTeacher):
     def __init__(self, policy=None, n_actions=1, lr=0.1, absolute=False, temperature=1.0):
         super().__init__(n_actions)
         if policy is None:
@@ -202,6 +202,29 @@ class OnlineSlopeBanditTeacher(AbstractTeacher):
             self.Q = self.Q + self.lr * (last_rewards - self.Q)
         return self.policy(np.abs(self.Q) if self.absolute else self.Q)
     
+class OnlineBanditTeacher(AbstractTeacher):
+    def __init__(self, policy=None, n_actions=1, lr=0.1, absolute=False, temperature=1.0):
+        super().__init__(n_actions)
+        if policy is None:
+            policy = BoltzmannPolicy(temperature)
+        self.policy = policy
+        self.lr = lr
+        self.absolute = absolute
+        self.Q = np.zeros(n_actions)
+        self.a = None
+
+    def give_task(self, last_rewards):
+        if last_rewards is not None:
+            if np.isnan(last_rewards).any():
+                np.nan_to_num(last_rewards, copy=False, nan=0.0)
+            self.Q[self.a] = self.Q[self.a] + self.lr * (last_rewards[self.a] - self.Q[self.a])
+
+        p = self.policy(np.abs(self.Q) if self.absolute else self.Q)
+        self.a = np.random.choice(np.arange(len(p)), size=1, p=p)
+        out = np.zeros(len(p))
+        out[self.a] = 1
+        return out 
+ 
 
 
 class SamplingTeacher(AbstractTeacher):

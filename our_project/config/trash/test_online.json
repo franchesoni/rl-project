@@ -10,12 +10,13 @@
 "NUM_CHARS": 12,
 "LR": 0.001,
 "ABSOLUTE": true,
-"SUMMARY_WRITER_PATH": "./runs/new/test_direct",
-"TEACHER_NAME": "curriculum", 
+"SUMMARY_WRITER_PATH": "./runs/trash/test_online",
+"TEACHER_NAME": "online", 
 "BOLTZMANN_TEMPERATURE": 0.05,
 "TEACHER_LR": 1,
-"SAVE_MODEL": true,
+"SAVE_MODEL": false,
 "SHOW_ADD": false,
 "SEED": 0,
 "OPTIM": "Adam",
-"CLASS_NUMBER": 3}
+"CLASS_NUMBER": 3,
+"COMMENT": "The best we've got. Absolute difference a reward."}

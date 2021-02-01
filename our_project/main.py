@@ -8,9 +8,9 @@ from cfg import (CONFIG_FILE, CURRICULUM, _CURRICULUMS, CURRICULUM_SCHEDULE,
     N_INTERACTIONS, WRITER, MAX_DIGITS, TEACHER_NAME, SAVE_MODEL, SHOW_ADD,
     ABSOLUTE, SUMMARY_WRITER_PATH, CLASS_NUMBER, BOLTZMANN_TEMPERATURE,
     TEACHER_LR)
-from classroom import AdditionClassroom, AdditionClassroom2, AdditionClassroom3, CharacterTable, AdditionTask
-from students import AdditionStudent, AdditionLSTM
-from teachers import (CurriculumTeacher, OnlineSlopeBanditTeacher,
+from classroom import AdditionClassroom, AdditionClassroom_AbsoluteDiff, AdditionClassroom_PG, AdditionClassroom_RelativeRewards, CharacterTable, AdditionTask
+from students import AdditionStudent, AdditionLSTM, AdditionStudent_PG
+from teachers import (CurriculumTeacher, OnlineBanditTeacher, OnlineSlopeSequentialTeacher,
     SamplingTeacher, RAWUCBTeacher)
 
 
@@ -23,9 +23,9 @@ Seed and writer dest are in classroom.py.'''
 
 def run_specific_teacher_addition(
         teacher_name=TEACHER_NAME, show_addition=SHOW_ADD,
-        show_freq=10, dist_show="direct"):
+        show_freq=10, dist_show="uniform"):
     if teacher_name == 'online':
-        teacher = OnlineSlopeBanditTeacher(
+        teacher = OnlineSlopeSequentialTeacher(
             n_actions=MAX_DIGITS, absolute=ABSOLUTE,
             temperature=BOLTZMANN_TEMPERATURE, lr=TEACHER_LR)
     elif teacher_name == 'curriculum':
@@ -38,16 +38,24 @@ def run_specific_teacher_addition(
     elif teacher_name == 'raw':   
         teacher = RAWUCBTeacher(
             n_actions=MAX_DIGITS)
+    elif teacher_name == 'online_bandit':   
+        teacher = OnlineBanditTeacher(
+            n_actions=MAX_DIGITS, absolute=ABSOLUTE,
+            temperature=BOLTZMANN_TEMPERATURE, lr=TEACHER_LR)
     else:
         raise ValueError
 
     student = AdditionStudent()
-    if CLASS_NUMBER == 1:
+    if CLASS_NUMBER == 1:  # obs difference, accuracy per length as obs
         classroom = AdditionClassroom(teacher=teacher, student=student)
     elif CLASS_NUMBER == 2:
-        classroom = AdditionClassroom2(teacher=teacher, student=student)
-    elif CLASS_NUMBER == 3:
-        classroom = AdditionClassroom3(teacher=teacher, student=student)
+        classroom = AdditionClassroom_RelativeRewards(teacher=teacher, student=student)
+    elif CLASS_NUMBER == 3:  # abs(obs difference), accuracy per length as obs
+        classroom = AdditionClassroom_AbsoluteDiff(teacher=teacher, student=student)
+    elif CLASS_NUMBER == 4: 
+        student = AdditionStudent_PG()
+        classroom = AdditionClassroom_PG(teacher=teacher, student=student)
+
     else:
         raise ValueError("CLASS_NUMBER {} is not a valid classroom number.".format(CLASS_NUMBER))
     
@@ -134,5 +142,4 @@ def show_addition_examples(
     return X, y, lengths, model
 
 if __name__=='__main__':
-
-    run_specific_teacher_addition(dist_show="uniform")
+    run_specific_teacher_addition()

@@ -147,6 +147,7 @@ class ToyRottingProblem:
 
 ###############################################
 class AdditionClassroom(AbstractClassroom):
+    """ Uses difference between observations """
     def __init__(self, teacher, student):
         super().__init__(teacher, student)
         self.past_obs = [0]  # initialize with something so we can take diff
@@ -178,7 +179,7 @@ class AdditionClassroom(AbstractClassroom):
         return self.compute_reward_diff(obs)
 
 
-class AdditionClassroom2(AdditionClassroom):
+class AdditionClassroom_RelativeRewards(AdditionClassroom):
     def __init__(self, teacher, student, reward_fn=REWARD_FN):
         super().__init__(teacher, student)
         self.past_obs = None
@@ -198,7 +199,7 @@ class AdditionClassroom2(AdditionClassroom):
         a one hot vector when all work is finished."""
         val_dist = np.zeros_like(task_dist)  # validation distribution is on final task by default
         val_dist[-1] = 1  # final task
-        task = AdditionTask2(
+        task = AdditionTask_PerDigitLoss(
             train_dist=task_dist,
             train_size=TRAIN_SIZE,
             val_dist=val_dist,
@@ -210,17 +211,53 @@ class AdditionClassroom2(AdditionClassroom):
         )
         return task
 
-    def compute_obs_diff(self, obs):
+    def compute_obs_rel_diff(self, obs):
         if self.past_obs is None:
             self.past_obs = [obs]
         self.past_obs.append(obs)
         return (self.past_obs[-1] - self.past_obs[-2])/self.past_obs[-2]
 
     def compute_reward(self, obs):
-        return self.reward_fn(self.compute_obs_diff(obs))
+        return self.reward_fn(self.compute_obs_rel_diff(obs))
+
+class AdditionClassroom_PG(AdditionClassroom):
+    def __init__(self, teacher, student, reward_fn=REWARD_FN):
+        super().__init__(teacher, student)
+        self.past_obs = None
+        if reward_fn == "absolute":
+            self.reward_fn = np.abs
+        elif reward_fn == "identity":
+            self.reward_fn = lambda x: x
+        elif reward_fn == "square":
+            self.reward_fn = np.square
+        elif reward_fn == "neg identity":
+            self.reward_fn = lambda x: -x
+        elif reward_fn == "square root":
+            self.reward_fn = lambda x: np.sqrt(np.abs(x))
+        else:
+            raise ValueError("reward_fn: {} not valid".format(reward_fn))
+
+    def generate_task(self, task_dist):
+        """Generates a new task according to task_dist. Task dist should be
+        a one hot vector when all work is finished."""
+        assert BATCH_SIZE == EPOCHS == 1
+        task = AdditionTask_PG(
+            train_dist=task_dist,
+            train_size=TRAIN_SIZE,
+            val_dist=[1],  # one meaningless value
+            val_size=VAL_SIZE,
+            obs_size=OBS_SIZE,
+            batch_size=1,  # should be 1
+            epochs=1,  # should be 1
+            max_digits=MAX_DIGITS,
+        )
+        return task
+
+    def compute_reward(self, obs):
+        return self.reward_fn(obs)
 
 
-class AdditionClassroom3(AdditionClassroom):
+class AdditionClassroom_AbsoluteDiff(AdditionClassroom):
     def compute_reward(self, obs):
         return np.abs(self.compute_reward_diff(obs))
 
@@ -245,6 +282,7 @@ class AdditionTask(AbstractTask):
         super().__init__(
             train_dist, train_size, val_dist, val_size, obs_size, batch_size, epochs,
         )
+        self.last_loss = None  # to be overwrited by student
         self.val_dist = val_dist
         self.uniform_dist = np.ones_like(val_dist) / len(val_dist)
         self.max_digits = max_digits
@@ -352,7 +390,7 @@ class AdditionTask(AbstractTask):
         return val_score > 0.99
 
 
-class AdditionTask2(AdditionTask):
+class AdditionTask_PerDigitLoss(AdditionTask):
     def get_observation(self, model, size=OBS_SIZE):
         obs_data = self.generate_data(self.uniform_dist, size)
         obs_X, obs_y, obs_lens = obs_data
@@ -368,6 +406,26 @@ class AdditionTask2(AdditionTask):
                     for i in range(self.max_digits)
             ])
         return obs_loss
+
+class AdditionTask_PG(AdditionTask):
+    """ This task is an addition task whose observation is prediction gain as
+    in automated curriculum learning"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.reward_name = 'PG'
+        
+    def get_observation(self, model, last_loss, X, y, lens):
+        model.eval()
+        with torch.no_grad():
+            pred = model(X)
+            if len(pred.shape) == 2:
+                pred = pred.unsqueeze(1)
+            y_pred = pred.transpose(0, 1)
+            current_loss = self.loss_fn(pred, y, lens)
+            current_loss = current_loss.detach()
+
+        return np.array([current_loss - last_loss] * self.max_digits)  # all the same loss
+
 
 
 
