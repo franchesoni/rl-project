@@ -1,12 +1,12 @@
 ### experimental
-rm -rf runs/trash2/
-python3 main.py --config-file trash2/example.json
-python3 main.py --config-file trash2/example_copy_2.json
-python3 main.py --config-file trash2/example_copy_3.json
-python3 main.py --config-file trash2/example_copy_4.json
-python3 main.py --config-file trash2/example_copy_5.json
-python3 main.py --config-file trash2/example_copy_6.json
-python3 main.py --config-file trash2/example_copy_7.json
+# rm -rf runs/trash2/
+# python3 main.py --config-file trash2/example.json
+# python3 main.py --config-file trash2/example_copy_2.json
+# python3 main.py --config-file trash2/example_copy_3.json
+# python3 main.py --config-file trash2/example_copy_4.json
+# python3 main.py --config-file trash2/example_copy_5.json
+# python3 main.py --config-file trash2/example_copy_6.json
+# python3 main.py --config-file trash2/example_copy_7.json
 
 # python3 main.py --config-file trash2/test_direct.json
 # echo "finished"
@@ -107,6 +107,9 @@ python3 main.py --config-file trash2/example_copy_7.json
 # python3 main.py --config-file franco_3/config_2_franco.json
 # cp -r runs/franco_2/raw_3_1epoch runs/franco_3/raw_3
 
-
+python3 main.py --config-file report/just_online.json
+python3 main.py --config-file report/raw.json
+python3 main.py --config-file report/ban_online.json
+python3 main.py --config-file report/seq_online.json
 
 

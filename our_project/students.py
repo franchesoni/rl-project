@@ -67,12 +67,13 @@ class Logger:
     def logging_fn(self, pred, y, lens, task):
         scores = {}
         y = y * 1
-        pred = pred.numpy()
+        pred = pred.cpu().numpy()
         with torch.no_grad():
             scores["acc_per_len"] = task.accuracy_per_length(pred, y, lens)
             scores["full_n_acc"] = task.full_number_accuracy(torch.tensor(pred), torch.tensor(y))
             scores["loss_fn"] = task.loss_fn(torch.tensor(pred), torch.tensor(y), lens)
             scores["per_digit_loss"] = task.per_digit_loss(torch.tensor(pred), y, lens)
+            scores["distribution"] = task.train_dist
         return scores
 
 
@@ -129,6 +130,7 @@ class AbstractStudent:
             current_ind += batch_size
 
             # update weights
+            self.model.train()  # set mode
             self.optimizer.zero_grad()
             pred = self.model(X)
             if len(pred.shape) == 2:
