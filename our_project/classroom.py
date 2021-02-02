@@ -131,10 +131,10 @@ class AdditionClassroom(AbstractClassroom):
         elif reward_fn == "square root":
             self.reward_fn = lambda x: np.sqrt(np.abs(x))
         elif reward_fn == "diff":
-            self.past_obs = [0]  # initialize with something so we can take diff
+            self.past_obs = None  # initialize with something so we can take diff
             self.reward_fn = self._compute_reward_diff
         elif reward_fn == "rel diff":
-            self.past_obs = [0]  # initialize with something so we can take diff
+            self.past_obs = None  # initialize with something so we can take diff
             self.reward_fn = self._compute_reward_rel_diff
         # one could concatenate things here
         else:
@@ -322,11 +322,13 @@ class AdditionSequentialTask(AdditionTask):
             self.get_observation = self.get_observation_per_digit_loss
         elif obs_type == "accuracy_per_length":
             self.get_observation = self.get_observation_accuracy_per_length
+        else:
+            raise ValueError('obs_type is incorrect')
 
     def get_observation_accuracy_per_length(self, model, size=OBS_SIZE):
         """Computes the observation given model. This should be reimplemented
         inside Student if it's too inefficient to make a whole new computation."""
-        obs_data = self.generate_data(self.uniform_dist, size)
+        obs_data = self.generate_data(self.max_digits * [1 / self.max_digits], size)
         obs_X, obs_y, obs_lens = obs_data
         obs_X = torch.from_numpy(obs_X).float().to(model.device)
         pred = model(obs_X).transpose(0, 1)

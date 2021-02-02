@@ -49,7 +49,8 @@ NUM_CHARS = config.get("NUM_CHARS", 12)
 # bandit params
 ABSOLUTE = config.get("absolute", False)
 REWARD_FN = config.get("REWARD_FN", "absolute")
-OBS_TYPE = config.get("OBS_TYPE", "per_digit_loss")
+OBS_TYPE = config.get("OBS_TYPE", "per_digit_loss")  # 'per_digit_loss' or 'accuracy_per_length' for sequential, 'prediction_gain' for bandit. It's possible to add more!
+
 MODE = config.get("MODE", "sequential")
 ###############################################################################
 # training params

@@ -1,6 +1,13 @@
 ### experimental
 rm -rf runs/trash2/
 python3 main.py --config-file trash2/example.json
+python3 main.py --config-file trash2/example_copy_2.json
+python3 main.py --config-file trash2/example_copy_3.json
+python3 main.py --config-file trash2/example_copy_4.json
+python3 main.py --config-file trash2/example_copy_5.json
+python3 main.py --config-file trash2/example_copy_6.json
+python3 main.py --config-file trash2/example_copy_7.json
+
 # python3 main.py --config-file trash2/test_direct.json
 # echo "finished"
 # python3 main.py --config-file trash2/test_online.json

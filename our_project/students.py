@@ -174,7 +174,6 @@ class AdditionBanditStudent(AdditionStudent):
         # check that it was correctly initialized
         assert self.model is not None
         assert self.optimizer is not None
-        assert task.reward_name == "PG"  # only to be used with prediction gain
         assert (
             task.epochs == task.train_size == task.batch_size == 1
         )  # epochs and batch size is redundant
@@ -203,7 +202,7 @@ class AdditionBanditStudent(AdditionStudent):
         self.optimizer.step()
 
         self.update_count += 1
-        self.logger.log(loss.detach().item(), self.update_count, self.model)
+        self.logger.log(loss.detach().item(), self.update_count, self.model, task)
 
         # output observation of trained model
         observation = task.get_observation(self.model, loss.detach(), X, y, lens)
