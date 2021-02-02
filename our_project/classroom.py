@@ -48,9 +48,10 @@ class AbstractClassroom:
         obs = self.student.learn_from_task(task)
         self.reward = self.compute_reward(obs)
 
-        # WRITER.add_scalars("Classroom/observations", {str(i+1):ob for i, ob in enumerate(obs)}, self.global_step)
-        # WRITER.add_scalars("Classroom/rewards", {str(i+1):r for i, r in enumerate(self.reward)}, self.global_step)
-        # WRITER.add_scalars("Classroom/distribution", {str(i+1):d for i, d in enumerate(task_dist)}, self.global_step)
+        if self.student.update_count % self.student.logger.freq == 0:
+            WRITER.add_scalars("Classroom/observations", {str(i+1):ob for i, ob in enumerate(obs)}, self.student.update_count)
+            WRITER.add_scalars("Classroom/rewards", {str(i+1):r for i, r in enumerate(self.reward)}, self.student.update_count)
+            WRITER.add_scalars("Classroom/distribution", {str(i+1):d for i, d in enumerate(task_dist)}, self.student.update_count)
 
 
 """The abstract task has the training parameters for the student learning. It
