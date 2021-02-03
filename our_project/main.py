@@ -54,8 +54,8 @@ def run_specific_teacher_addition(
     classroom = AdditionClassroom(teacher=teacher, student=student)
     
     pbar = trange(N_INTERACTIONS)
+    pbar.set_description("Processing {}".format(CONFIG_FILE))
     for i in pbar:
-        pbar.set_description("Processing {}".format(CONFIG_FILE))
         classroom.step()
         if i % show_freq == 0 and show_addition:
             model_path = os.path.join(
