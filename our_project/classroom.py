@@ -150,7 +150,7 @@ class AdditionClassroom(AbstractClassroom):
         except ZeroDivisionError:
             return self.past_obs[-2]
 
-    def _compute_reward_diff(self, obs, warn=False):
+    def _compute_reward_diff(self, obs):
         if self.past_obs is None:
             self.past_obs = [obs]
         self.past_obs.append(obs)
