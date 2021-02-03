@@ -370,7 +370,7 @@ class AdditionBanditTask(AdditionTask):
             pred = model(X)
             if len(pred.shape) == 2:
                 pred = pred.unsqueeze(1)
-            y_pred = pred.transpose(0, 1)
+            pred = pred.transpose(0, 1) # used to be y_pred = pred.transpose(0,1)
             current_loss = self.loss_fn(pred, y, lens)
             current_loss = current_loss.detach()
 
