@@ -372,8 +372,8 @@ class AdditionBanditTask(AdditionTask):
             if len(pred.shape) == 2:
                 pred = pred.unsqueeze(1)
             pred = pred.transpose(0, 1) # used to be y_pred = pred.transpose(0,1)
-            current_loss = self.loss_fn(pred, y, lens)
-            current_loss = current_loss.detach()
+            current_loss = self.loss_fn(pred, y, lens).item()
+            # current_loss = current_loss.detach()
 
         return np.array(
             [current_loss - last_loss] * self.max_digits
