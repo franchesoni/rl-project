@@ -336,6 +336,7 @@ class AdditionSequentialTask(AdditionTask):
         obs_data = self.generate_data(self.max_digits * [1 / self.max_digits], size)
         obs_X, obs_y, obs_lens = obs_data
         obs_X = torch.from_numpy(obs_X).float().to(model.device)
+        model.eval()
         pred = model(obs_X).transpose(0, 1)
         return self.accuracy_per_length(pred.cpu().detach().numpy(), obs_y, obs_lens)
 
