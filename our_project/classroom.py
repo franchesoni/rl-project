@@ -145,13 +145,17 @@ class AdditionClassroom(AbstractClassroom):
         if self.past_obs is None:
             self.past_obs = [obs]
         self.past_obs.append(obs)
-        return (self.past_obs[-1] - self.past_obs[-2]) / self.past_obs[-2]
+        try:
+            return (self.past_obs[-1] - self.past_obs[-2]) / self.past_obs[-2]
+        except ZeroDivisionError:
+            return self.past_obs[-2]
 
     def _compute_reward_diff(self, obs, warn=False):
+        if self.past_obs is None:
+            self.past_obs = [obs]
         self.past_obs.append(obs)
-        if warn:
-            warnings.warn(RuntimeWarning("This is growing memory"))
         return self.past_obs[-1] - self.past_obs[-2]
+
 
     def set_task(self, task):
         if task == "bandit":
