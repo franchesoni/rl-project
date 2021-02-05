@@ -178,29 +178,33 @@ def test_RAWUCB():
     cum_regret = np.cumsum(regret)
     received_rewards = np.array(received_rewards)
     w = 100
-    plt.plot(received_rewards, ".")
-    plt.plot(
-        np.concatenate((np.ones(7500), np.ones(problem.T - 7500) * 0.4)), linewidth=4
-    )
-    plt.plot(np.ones(len(received_rewards)) * 0.5, linewidth=4)
+    plt.plot(received_rewards, ".", alpha=0.1)
     plt.plot(
         np.concatenate(
             (np.zeros(w - 1), np.convolve(received_rewards, np.ones(w) / w, "valid"))
-        )
+        ), linewidth=3
+    )    
+    plt.plot(
+        np.concatenate((np.ones(7500), np.ones(problem.T - 7500) * 0.4)), linewidth=3
     )
-    plt.plot(regret, "x")
-    plt.plot(cum_regret / cum_regret[-1], linewidth=4)
+    plt.plot(np.ones(len(received_rewards)) * 0.5, linewidth=3)
+
+    plt.plot(regret, linewidth=3)
+    plt.plot(cum_regret / cum_regret[-1], linewidth=3)
     plt.legend(
         [
             "Received rewards",
+            "Window averaged rewards with w={}".format(w),
             "Expected reward arm 1",
             "Expected reward arm 2",
-            f"Window averaged rewards with w={w}",
             "Regret",
             "Cummulative regret",
         ]
     )
-    plt.show()
+    plt.xlabel("Iterations")
+    plt.ylabel("Reward")
+    plt.title("RAW-UCB Algorithm")
+    plt.savefig("test_raw_ucb.png", dpi=500)
 
 
 ###############################################################################
